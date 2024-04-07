@@ -1,6 +1,5 @@
-import type { IContentScriptMessage, IMessage, ITabData } from '../interfaces';
+import type { ContentScriptMessage, ITabData, Message } from '../interfaces';
 import { DOMHelper } from './DomHelper';
-import { isScriptContextMessage, isWorkerMessage } from './constants';
 
 // Extracts username from the Instagram profile URL
 const getUsernameFromUrl = (url: string): string => {
@@ -219,8 +218,8 @@ const getBioLinkUrls = async (): Promise<string[]> => {
     return bioLinks;
 };
 
-const handleMessage = async (message: IMessage) => {
-    if (isWorkerMessage(message) && isScriptContextMessage(message)) {
+const handleMessage = async (message: Message) => {
+    if (message.source === 'Worker' && message.signal === 'send_context') {
         const { suggester, enableStackTrace } = message.scriptContext;
         const username = getUsernameFromUrl(document.URL);
 
@@ -241,7 +240,7 @@ const handleMessage = async (message: IMessage) => {
             suggester,
         };
 
-        const response: IContentScriptMessage = {
+        const response: ContentScriptMessage = {
             source: 'ContentScript',
             signal: 'complete',
             tabData: enableStackTrace

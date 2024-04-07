@@ -1,21 +1,17 @@
-import type {
-    IContentScriptMessageHandler,
-    IPopupMessageHandler,
-    IMessage,
-    IResponse,
-    IWorkerMessage,
-} from '../interfaces';
 import { LocalStorageWrapper } from '../LocalStorageWrapper';
 import {
-    isContentScriptMessage,
-    isPopupMessage,
-    isSettingsUpdateMessage,
-} from './constants';
+    ContentScriptMessage,
+    Message,
+    MessageHandler,
+    PopupMessage,
+    ResponseMessage,
+    WorkerMessage,
+} from '../interfaces';
 import { TabsFacade } from './TabsFacade';
 
-const PopupMessageHandler: IPopupMessageHandler = {
-    processMessage(message, sendResponse) {
-        if (isSettingsUpdateMessage(message)) {
+const PopupMessageHandler: MessageHandler<PopupMessage> = {
+    processMessage(message, _, sendResponse) {
+        if (message.signal === 'update_settings') {
             TabsFacade.updateMaxTabs(message.payload.maxTabs);
             TabsFacade.updateScriptContext({
                 enableStackTrace: message.payload.devMode,
@@ -42,8 +38,15 @@ const PopupMessageHandler: IPopupMessageHandler = {
     },
 };
 
-const ContentScriptMessageHandler: IContentScriptMessageHandler = {
-    async processMessage(message, sender) {
+const ContentScriptMessageHandler: MessageHandler<ContentScriptMessage> = {
+    processMessage(message, sender) {
+        this.saveContentScriptData(message, sender);
+        return false;
+    },
+    async saveContentScriptData(
+        message: ContentScriptMessage,
+        sender: chrome.runtime.MessageSender
+    ) {
         if (sender.tab) {
             TabsFacade.closeTab(sender.tab);
             if (message.tabData.suggestedProfiles)
@@ -53,7 +56,7 @@ const ContentScriptMessageHandler: IContentScriptMessageHandler = {
         const tabs = (await LocalStorageWrapper.get('tabs')) || [];
         tabs.push(tabData);
         await LocalStorageWrapper.set('tabs', tabs);
-        const workerMessage: IWorkerMessage = {
+        const workerMessage: WorkerMessage = {
             source: 'Worker',
             signal: 'refresh',
         };
@@ -62,18 +65,24 @@ const ContentScriptMessageHandler: IContentScriptMessageHandler = {
 };
 
 const messageRouter = (
-    message: IMessage,
+    message: Message,
     sender: chrome.runtime.MessageSender,
-    sendResponse: (response: IResponse) => void
+    sendResponse: (response: ResponseMessage) => void
 ) => {
-    if (isPopupMessage(message)) {
+    if (message.source === 'Popup') {
         const asyncResponse = PopupMessageHandler.processMessage(
             message,
+            sender,
             sendResponse
         );
         if (asyncResponse) return true;
-    } else if (isContentScriptMessage(message)) {
-        ContentScriptMessageHandler.processMessage(message, sender);
+    } else if (message.source === 'ContentScript') {
+        const asyncResponse = ContentScriptMessageHandler.processMessage(
+            message,
+            sender,
+            sendResponse
+        );
+        if (asyncResponse) return true;
     } else {
         sendResponse({
             success: false,

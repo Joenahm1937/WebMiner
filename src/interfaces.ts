@@ -1,59 +1,75 @@
-import { WORKER_SIGNAL } from './background/constants';
-import { CONTENT_SCRIPT_SIGNAL } from './content/constants';
-import { POPUP_SIGNAL } from './popup/constants';
+import {
+    WORKER_SIGNAL,
+    CONTENT_SCRIPT_SIGNAL,
+    POPUP_SIGNAL,
+} from './constants';
 
-export type Component = 'Worker' | 'Popup' | 'ContentScript';
+/**
+ * Types for Messaging between the background script, the popup UI, and the content scripts.
+ */
 
-export interface IMessage {
-    source: Component;
-}
+export type Message = WorkerMessage | PopupMessage | ContentScriptMessage;
 
-export interface IResponse {
-    success: boolean;
-    message?: string;
-}
-
-export interface IPopupMessage extends IMessage {
-    signal: (typeof POPUP_SIGNAL)[keyof typeof POPUP_SIGNAL];
-}
-
-export interface ISettingsUpdateMessage extends IPopupMessage {
-    payload: ISettings;
-}
-
-export interface IWorkerMessage extends IMessage {
-    signal: (typeof WORKER_SIGNAL)[keyof typeof WORKER_SIGNAL];
-}
-
-export interface IScriptContextMessage extends IWorkerMessage {
+// Worker-originated messages
+type BaseWorkerMessage = {
+    source: 'Worker';
+    signal: Exclude<
+        (typeof WORKER_SIGNAL)[keyof typeof WORKER_SIGNAL],
+        'send_context'
+    >;
+};
+export type WorkerScriptContextMessage = {
+    source: 'Worker';
+    signal: 'send_context';
     scriptContext: IScriptContextData;
-}
+};
+export type WorkerMessage = BaseWorkerMessage | WorkerScriptContextMessage;
 
-export interface IContentScriptMessage extends IMessage {
+// Popup-originated messages
+type BasePopupMessage = {
+    source: 'Popup';
+    signal: Exclude<
+        (typeof POPUP_SIGNAL)[keyof typeof POPUP_SIGNAL],
+        'update_settings'
+    >;
+};
+export type PopupSettingsUpdateMessage = {
+    source: 'Popup';
+    signal: 'update_settings';
+    payload: ISettings;
+};
+export type PopupMessage = BasePopupMessage | PopupSettingsUpdateMessage;
+
+// Content script-originated messages
+export type ContentScriptMessage = {
+    source: 'ContentScript';
     signal: (typeof CONTENT_SCRIPT_SIGNAL)[keyof typeof CONTENT_SCRIPT_SIGNAL];
     tabData: ITabData;
-}
+};
 
-export interface IPopupMessageHandler {
-    /**
-     *
-     * @param message
-     * @param sendResponse
-     * @returns boolean - Returns true to Signal Async Response
-     * Refer to https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
-     */
+// Defines response structure for message handlers.
+export type ResponseMessage = {
+    success: boolean;
+    message?: string;
+};
+
+/**
+ * Interface for message handling across different components.
+ * https://developer.chrome.com/docs/extensions/develop/concepts/messaging#simple
+ * To use sendResponse() asynchronously, return true in the onMessage event handler.
+ */
+export interface MessageHandler<TMessage extends Message> {
     processMessage: (
-        message: IPopupMessage,
-        sendResponse: (response: IResponse) => void
+        message: TMessage,
+        sender: chrome.runtime.MessageSender,
+        sendResponse: (response: ResponseMessage) => void
     ) => boolean;
+    [key: string]: Function;
 }
 
-export interface IContentScriptMessageHandler {
-    processMessage: (
-        message: IContentScriptMessage,
-        sender: chrome.runtime.MessageSender
-    ) => void;
-}
+/**
+ * Types for Local Storage Interaction
+ */
 
 type SerializableValue =
     | undefined
@@ -100,6 +116,10 @@ export interface ILocalStorage {
 }
 
 export type LocalStorageKeys = keyof ILocalStorage;
+
+/**
+ * Types for Logging
+ */
 
 export type Severity = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL';
 

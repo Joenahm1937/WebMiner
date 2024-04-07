@@ -1,7 +1,7 @@
 import type {
-    IScriptContextMessage,
     IProfile,
     IScriptContextData,
+    WorkerScriptContextMessage,
 } from '../interfaces';
 import {
     INSTAGRAM_PROFILE_PAGE_REGEX,
@@ -146,14 +146,16 @@ class TabsFacadeClass {
                                         files: ['contentScript.js'],
                                     },
                                     () => {
-                                        const message: IScriptContextMessage = {
-                                            source: 'Worker',
-                                            signal: 'send_context',
-                                            scriptContext: {
-                                                ...this.scriptContext,
-                                                suggester: profile.suggester,
-                                            },
-                                        };
+                                        const message: WorkerScriptContextMessage =
+                                            {
+                                                source: 'Worker',
+                                                signal: 'send_context',
+                                                scriptContext: {
+                                                    ...this.scriptContext,
+                                                    suggester:
+                                                        profile.suggester,
+                                                },
+                                            };
                                         chrome.tabs.sendMessage(
                                             tab.id as number,
                                             message

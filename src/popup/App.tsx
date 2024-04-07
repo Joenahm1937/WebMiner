@@ -1,9 +1,9 @@
 import type {
-    IMessage,
-    IPopupMessage,
-    IResponse,
-    ISettingsUpdateMessage,
     ITabData,
+    Message,
+    PopupMessage,
+    PopupSettingsUpdateMessage,
+    ResponseMessage,
 } from '../interfaces';
 import { useEffect, useState, useRef } from 'react';
 import logo from '/logo.svg';
@@ -11,8 +11,6 @@ import settings from '/settings.svg';
 import './App.css';
 import {
     TOGGLE_RUNNING_STATE,
-    POPUP_SIGNAL,
-    isWorkerMessage,
     EXTENSION_HEADER,
     RESET_BUTTON_TEXT,
 } from './constants';
@@ -22,6 +20,7 @@ import ErrorComponent from './ErrorComponent';
 import RunningAnimation from './RunningAnimation';
 import SettingsModal from './SettingsModal';
 import { useAppContext } from './AppContext';
+import { POPUP_SIGNAL } from '../constants';
 
 const App = () => {
     const [running, setRunning] = useState(false);
@@ -35,8 +34,8 @@ const App = () => {
 
     useEffect(() => {
         initializeUI();
-        const handleMessage = (message: IMessage) => {
-            if (isWorkerMessage(message) && message.signal === 'refresh') {
+        const handleMessage = (message: Message) => {
+            if (message.source === 'Worker' && message.signal === 'refresh') {
                 refreshUI();
             }
         };
@@ -51,7 +50,7 @@ const App = () => {
             return;
         }
 
-        const message: ISettingsUpdateMessage = {
+        const message: PopupSettingsUpdateMessage = {
             source: 'Popup',
             signal: 'update_settings',
             payload: {
@@ -92,14 +91,14 @@ const App = () => {
 
     const toggleScraping = async () => {
         const runningStatus = running ? POPUP_SIGNAL.STOP : POPUP_SIGNAL.START;
-        const message: IPopupMessage = {
+        const message: PopupMessage = {
             source: 'Popup',
             signal: runningStatus,
         };
         const newRunningStatus = !running;
         await LocalStorageWrapper.set('isRunning', !running);
         setRunning((prevRunningState) => !prevRunningState);
-        chrome.runtime.sendMessage(message, (response: IResponse) => {
+        chrome.runtime.sendMessage(message, (response: ResponseMessage) => {
             if (!response.success) {
                 LocalStorageWrapper.set('isRunning', !newRunningStatus);
                 setRunning((prevRunningState) => !prevRunningState);
@@ -110,7 +109,7 @@ const App = () => {
 
     const reset = async () => {
         LocalStorageWrapper.remove(['isRunning', 'tabs']);
-        const message: IPopupMessage = {
+        const message: PopupMessage = {
             source: 'Popup',
             signal: 'restart',
         };
