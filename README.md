@@ -1,25 +1,21 @@
-# Sourcing Assistant
+# Web Miner
 
-Sourcing Assistant is a Chrome extension designed to streamline the process of collecting profiles related to a specific account for marketing purposes.
-By automating manual browsing activities, it enables users to efficiently build a network of similar accounts starting from a given account.
+## Overview
 
-![](https://github.com/Joenahm1937/SourcingExtension/assets/41309544/933a4fc6-64b3-4ce5-b13f-886a3fa8bbae)
+**Web Miner** is a Chrome Extension currently under active development, designed to simplify the creation of automated web interaction scripts. 
+Leveraging a library of basic commands, users can easily craft scripts for a wide range of purposes—from scraping web page data to automating repetitive tasks such as form submissions. 
+Our vision extends to enabling script creation and visualization through the extension, with capabilities to save and execute scripts offline. 
+Future updates aim to integrate an LLM node to assist users in script development further.
 
 ## Features
 
--   **Easy to Start**: Install the extension and begin the process with a simple click.
--   **Control Your Collection**: Stop collecting profiles at any time and reset to clear your cache.
--   **User-Created Content Scripts**: Version 2 offers the ability for users to create their own content scripts, providing flexibility for various use cases.
--   **Advanced Configuration**: Customize settings such as the number of tabs to open in parallel and enable debug logging for more granular control.
-
-_Note_: Due to frequent UI updates by Instagram, the extension's content script may occasionally fail.
-Instagram's recent changes also require users to actively click into a newly created tab to initiate the script.
+- **Simple Interface:** Craft your automation scripts with ease.
+- **Cloud Synchronization:** Save your scripts to the cloud for access and execution anytime, anywhere.
+- **Intelligent Script Assistance:** Future updates will include LLM integration, offering guidance in script development.
 
 ## How It Works
 
-1. **Installation**: Add the extension to your Chrome browser.
-2. **Activation**: Click the 'Start' button to begin collecting profiles. You can stop at any time and reset to clear the collected profiles cache.
-3. **Configuration**: For more detailed settings, access the advanced configuration through the settings icon.
+*Documentation and detailed usage instructions will be provided in future updates.*
 
 ## Development Setup
 
