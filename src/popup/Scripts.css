@@ -1,0 +1,18 @@
+.scripts {
+    list-style: none;
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.script-card {
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    padding: 1em;
+    transition: transform 0.2s ease;
+}
+
+.script-card:hover {
+    transform: translateY(-0.5em);
+}

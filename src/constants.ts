@@ -1,15 +1,15 @@
-export const WORKER_SIGNAL = {
-    REFRESH_POPUP: 'refresh',
-    SEND_CONTEXT: 'send_context',
+export const WorkerSignals = {
+    RefreshPopup: 'REFRESH_POPUP',
+    StartPageScript: 'START_PAGE_SCRIPT',
 } as const;
 
-export const CONTENT_SCRIPT_SIGNAL = {
-    COMPLETE: 'complete',
+export const ContentScriptSignals = {
+    Completed: 'COMPLETED',
 } as const;
 
-export const POPUP_SIGNAL = {
-    START: 'start',
-    STOP: 'stop',
-    RESTART: 'restart',
-    SETTINGS_UPDATE: 'update_settings',
+export const PopupSignals = {
+    Start: 'START',
+    Stop: 'STOP',
+    Restart: 'RESTART',
+    UpdateSettings: 'UPDATE_SETTINGS',
 } as const;

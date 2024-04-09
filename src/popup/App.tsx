@@ -1,5 +1,5 @@
 import type {
-    ITabData,
+    UserScript,
     Message,
     PopupMessage,
     PopupSettingsUpdateMessage,
@@ -15,27 +15,29 @@ import {
     RESET_BUTTON_TEXT,
 } from './constants';
 import { LocalStorageWrapper } from '../LocalStorageWrapper';
-import TabCardList from './TabCardList';
+import ScriptCardList from './ScriptList';
 import ErrorComponent from './ErrorComponent';
 import RunningAnimation from './RunningAnimation';
 import SettingsModal from './SettingsModal';
 import { useAppContext } from './AppContext';
-import { POPUP_SIGNAL } from '../constants';
+import { PopupSignals } from '../constants';
 
 const App = () => {
     const [running, setRunning] = useState(false);
-    const [tabs, setTabs] = useState<ITabData[]>([]);
+    const [scripts, setScripts] = useState<UserScript[]>([]);
     const [errorMessage, setErrorMessage] = useState<string>();
     const [settingsVisible, setSettingsVisible] = useState<boolean>(false);
     const isFirstMount = useRef(true);
 
-    const { developerMode, maxTabs, setDeveloperMode, setMaxTabs } =
-        useAppContext();
+    const { developerMode, setDeveloperMode } = useAppContext();
 
     useEffect(() => {
         initializeUI();
         const handleMessage = (message: Message) => {
-            if (message.source === 'Worker' && message.signal === 'refresh') {
+            if (
+                message.source === 'Worker' &&
+                message.signal === 'REFRESH_POPUP'
+            ) {
                 refreshUI();
             }
         };
@@ -52,36 +54,32 @@ const App = () => {
 
         const message: PopupSettingsUpdateMessage = {
             source: 'Popup',
-            signal: 'update_settings',
+            signal: 'UPDATE_SETTINGS',
             payload: {
                 devMode: developerMode,
-                maxTabs,
             },
         };
 
         const updateSettings = async () => {
             await LocalStorageWrapper.set('devMode', developerMode);
-            await LocalStorageWrapper.set('maxTabs', maxTabs);
             chrome.runtime.sendMessage(message);
         };
 
         updateSettings();
-    }, [developerMode, maxTabs]);
+    }, [developerMode]);
 
     const initializeUI = async () => {
-        const storedTabs = await LocalStorageWrapper.get('tabs');
+        const storedScripts = await LocalStorageWrapper.get('userScripts');
         const storedRunningStatus = await LocalStorageWrapper.get('isRunning');
         const storedDevMode = await LocalStorageWrapper.get('devMode');
-        const storedMaxTabs = await LocalStorageWrapper.get('maxTabs');
-        if (storedTabs) setTabs(storedTabs);
+        if (storedScripts) setScripts(storedScripts);
         if (storedRunningStatus) setRunning(storedRunningStatus);
         if (storedDevMode) setDeveloperMode(storedDevMode);
-        if (storedMaxTabs) setMaxTabs(storedMaxTabs);
     };
 
     const refreshUI = () => {
-        LocalStorageWrapper.get('tabs').then((tabs) => {
-            setTabs(tabs || []);
+        LocalStorageWrapper.get('userScripts').then((userScripts) => {
+            setScripts(userScripts || []);
         });
     };
 
@@ -90,7 +88,7 @@ const App = () => {
     };
 
     const toggleScraping = async () => {
-        const runningStatus = running ? POPUP_SIGNAL.STOP : POPUP_SIGNAL.START;
+        const runningStatus = running ? PopupSignals.Stop : PopupSignals.Start;
         const message: PopupMessage = {
             source: 'Popup',
             signal: runningStatus,
@@ -108,10 +106,10 @@ const App = () => {
     };
 
     const reset = async () => {
-        LocalStorageWrapper.remove(['isRunning', 'tabs']);
+        LocalStorageWrapper.remove(['isRunning', 'userScripts']);
         const message: PopupMessage = {
             source: 'Popup',
-            signal: 'restart',
+            signal: 'RESTART',
         };
         chrome.runtime.sendMessage(message);
         refreshUI();
@@ -143,13 +141,13 @@ const App = () => {
                         : TOGGLE_RUNNING_STATE.REST}
                 </button>
                 {running ? <RunningAnimation /> : null}
-                {!running && tabs.length ? (
+                {!running && scripts.length ? (
                     <button onClick={reset}>{RESET_BUTTON_TEXT}</button>
                 ) : null}
             </div>
 
             <ErrorComponent message={errorMessage} />
-            <TabCardList tabs={tabs} />
+            <ScriptCardList scripts={scripts} />
         </>
     );
 };

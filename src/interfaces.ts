@@ -1,8 +1,4 @@
-import {
-    WORKER_SIGNAL,
-    CONTENT_SCRIPT_SIGNAL,
-    POPUP_SIGNAL,
-} from './constants';
+import { WorkerSignals, ContentScriptSignals, PopupSignals } from './constants';
 
 /**
  * Types for Messaging between the background script, the popup UI, and the content scripts.
@@ -14,14 +10,14 @@ export type Message = WorkerMessage | PopupMessage | ContentScriptMessage;
 type BaseWorkerMessage = {
     source: 'Worker';
     signal: Exclude<
-        (typeof WORKER_SIGNAL)[keyof typeof WORKER_SIGNAL],
-        'send_context'
+        (typeof WorkerSignals)[keyof typeof WorkerSignals],
+        'START_PAGE_SCRIPT'
     >;
 };
 export type WorkerScriptContextMessage = {
     source: 'Worker';
-    signal: 'send_context';
-    scriptContext: IScriptContextData;
+    signal: 'START_PAGE_SCRIPT';
+    settings: Settings;
 };
 export type WorkerMessage = BaseWorkerMessage | WorkerScriptContextMessage;
 
@@ -29,22 +25,22 @@ export type WorkerMessage = BaseWorkerMessage | WorkerScriptContextMessage;
 type BasePopupMessage = {
     source: 'Popup';
     signal: Exclude<
-        (typeof POPUP_SIGNAL)[keyof typeof POPUP_SIGNAL],
-        'update_settings'
+        (typeof PopupSignals)[keyof typeof PopupSignals],
+        'UPDATE_SETTINGS'
     >;
 };
 export type PopupSettingsUpdateMessage = {
     source: 'Popup';
-    signal: 'update_settings';
-    payload: ISettings;
+    signal: 'UPDATE_SETTINGS';
+    payload: Settings;
 };
 export type PopupMessage = BasePopupMessage | PopupSettingsUpdateMessage;
 
 // Content script-originated messages
 export type ContentScriptMessage = {
     source: 'ContentScript';
-    signal: (typeof CONTENT_SCRIPT_SIGNAL)[keyof typeof CONTENT_SCRIPT_SIGNAL];
-    tabData: ITabData;
+    signal: (typeof ContentScriptSignals)[keyof typeof ContentScriptSignals];
+    userScript: UserScript;
 };
 
 // Defines response structure for message handlers.
@@ -81,38 +77,18 @@ type SerializableValue =
 type SerializableObject = { [key: string]: SerializableValue };
 type SerializableArray = SerializableValue[];
 
-export interface ISettings extends SerializableObject {
+export interface Settings extends SerializableObject {
     devMode: boolean;
-    maxTabs: number;
 }
 
-export interface IScriptContextData extends SerializableObject {
-    suggester?: string;
-    enableStackTrace: boolean;
-}
-
-export interface IProfile extends SerializableObject {
-    suggester?: string;
-    url: string;
-}
-
-export interface ITabData extends SerializableObject {
-    url: string;
-    user: string;
-    fatalErrors: ILog[];
-    profileImageUrl?: string;
-    bioLinkUrls?: string[];
-    followerCount?: string;
-    suggestedProfiles?: IProfile[];
-    suggester?: string;
-    logs?: ILog[];
+export interface UserScript extends SerializableObject {
+    id: number;
 }
 
 export interface ILocalStorage {
     isRunning: boolean;
-    tabs: ITabData[];
+    userScripts: UserScript[];
     devMode: boolean;
-    maxTabs: number;
 }
 
 export type LocalStorageKeys = keyof ILocalStorage;

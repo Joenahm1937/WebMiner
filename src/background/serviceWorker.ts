@@ -7,17 +7,16 @@ import {
     ResponseMessage,
     WorkerMessage,
 } from '../interfaces';
-import { TabsFacade } from './TabsFacade';
+import { PageScriptCoordinator } from './PageScriptCoordinator';
 
 const PopupMessageHandler: MessageHandler<PopupMessage> = {
     processMessage(message, _, sendResponse) {
-        if (message.signal === 'update_settings') {
-            TabsFacade.updateMaxTabs(message.payload.maxTabs);
-            TabsFacade.updateScriptContext({
+        if (message.signal === 'UPDATE_SETTINGS') {
+            PageScriptCoordinator.updateSettings({
                 enableStackTrace: message.payload.devMode,
             });
-        } else if (message.signal === 'start') {
-            TabsFacade.startProcessing((error?: Error) => {
+        } else if (message.signal === 'START') {
+            PageScriptCoordinator.startProcessing((error?: Error) => {
                 if (error) {
                     sendResponse({ success: false, message: error.message });
                 } else {
@@ -27,11 +26,7 @@ const PopupMessageHandler: MessageHandler<PopupMessage> = {
                 }
             });
             return true;
-        } else if (message.signal === 'stop') {
-            TabsFacade.stopProcessing();
-            sendResponse({ success: true });
-        } else if (message.signal === 'restart') {
-            TabsFacade.flushQueue();
+        } else if (message.signal === 'STOP') {
             sendResponse({ success: true });
         }
         return false;
@@ -39,26 +34,19 @@ const PopupMessageHandler: MessageHandler<PopupMessage> = {
 };
 
 const ContentScriptMessageHandler: MessageHandler<ContentScriptMessage> = {
-    processMessage(message, sender) {
-        this.saveContentScriptData(message, sender);
+    processMessage(message) {
+        this.saveContentScriptData(message);
         return false;
     },
-    async saveContentScriptData(
-        message: ContentScriptMessage,
-        sender: chrome.runtime.MessageSender
-    ) {
-        if (sender.tab) {
-            TabsFacade.closeTab(sender.tab);
-            if (message.tabData.suggestedProfiles)
-                TabsFacade.enqueue(message.tabData.suggestedProfiles);
-        }
-        const tabData = message.tabData;
-        const tabs = (await LocalStorageWrapper.get('tabs')) || [];
-        tabs.push(tabData);
-        await LocalStorageWrapper.set('tabs', tabs);
+    async saveContentScriptData(message: ContentScriptMessage) {
+        const userScript = message.userScript;
+        const userScripts =
+            (await LocalStorageWrapper.get('userScripts')) || [];
+        userScripts.push(userScript);
+        await LocalStorageWrapper.set('userScripts', userScripts);
         const workerMessage: WorkerMessage = {
             source: 'Worker',
-            signal: 'refresh',
+            signal: 'REFRESH_POPUP',
         };
         chrome.runtime.sendMessage(workerMessage);
     },

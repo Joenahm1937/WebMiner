@@ -1,11 +1,8 @@
 import './SettingsModal.css';
 import { useAppContext } from './AppContext';
 
-const MAX_TABS_LIMIT = 10;
-
 const SettingsModal = () => {
-    const { developerMode, setDeveloperMode, maxTabs, setMaxTabs } =
-        useAppContext();
+    const { developerMode, setDeveloperMode } = useAppContext();
 
     return (
         <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
@@ -22,31 +19,6 @@ const SettingsModal = () => {
                         <span className="slider round"></span>
                     </label>
                     <span>Developer Mode</span>
-                </div>
-                <div className="setting">
-                    <label htmlFor="max-tabs">Max Tabs:</label>
-                    <input
-                        type="number"
-                        id="max-tabs"
-                        min="1"
-                        max={MAX_TABS_LIMIT}
-                        value={maxTabs}
-                        onChange={(e) => {
-                            const maxTabInput = parseInt(e.target.value);
-                            if (
-                                maxTabInput <= MAX_TABS_LIMIT &&
-                                MAX_TABS_LIMIT >= 0
-                            ) {
-                                setMaxTabs(parseInt(e.target.value));
-                            }
-                        }}
-                    />
-                    {maxTabs > 5 && (
-                        <small>
-                            Warning: Setting more than 6 tabs may degrade
-                            performance.
-                        </small>
-                    )}
                 </div>
             </div>
         </div>

@@ -10,8 +10,6 @@ import React, {
 interface AppContextType {
     developerMode: boolean;
     setDeveloperMode: Dispatch<SetStateAction<boolean>>;
-    maxTabs: number;
-    setMaxTabs: Dispatch<SetStateAction<number>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -22,9 +20,8 @@ interface AppProviderProps {
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const [developerMode, setDeveloperMode] = useState<boolean>(false);
-    const [maxTabs, setMaxTabs] = useState<number>(5);
 
-    const value = { developerMode, setDeveloperMode, maxTabs, setMaxTabs };
+    const value = { developerMode, setDeveloperMode };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
