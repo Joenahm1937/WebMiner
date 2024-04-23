@@ -1,4 +1,8 @@
-import type { Settings, WorkerScriptContextMessage } from '../interfaces';
+import type {
+    Settings,
+    WorkerMessage,
+    WorkerScriptContextMessage,
+} from '../interfaces';
 import { NO_TAB_PERMISSION_ERROR } from './constants';
 import { IValidatedTab } from './interfaces';
 
@@ -44,6 +48,23 @@ class PageScriptCoordinatorClass {
                             chrome.tabs.sendMessage(currentTab.id, message);
                         }
                     );
+                }
+            } catch (error) {
+                callback(error as Error);
+            }
+        });
+    };
+
+    public stopProcessing = (callback: Function) => {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            const currentTab = tabs[0];
+            try {
+                if (this.isValidTab(currentTab)) {
+                    const message: WorkerMessage = {
+                        source: 'Worker',
+                        signal: 'STOP_PAGE_SCRIPT',
+                    };
+                    chrome.tabs.sendMessage(currentTab.id, message);
                 }
             } catch (error) {
                 callback(error as Error);

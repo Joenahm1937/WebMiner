@@ -1,6 +1,7 @@
 export const WorkerSignals = {
     RefreshPopup: 'REFRESH_POPUP',
     StartPageScript: 'START_PAGE_SCRIPT',
+    StopPageScript: 'STOP_PAGE_SCRIPT',
 } as const;
 
 export const ContentScriptSignals = {

@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "sourcing-extension",
-    "description": "automates sourcing for marketing professionals",
+    "name": "web-miner",
+    "description": "Simplifies the creation of automated web interaction scripts",
     "version": "1.0",
     "permissions": ["storage", "tabs", "activeTab", "scripting"],
     "host_permissions": ["http://*/*", "https://*/*"],

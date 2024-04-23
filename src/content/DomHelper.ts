@@ -11,10 +11,6 @@ export class DOMHelperClass {
     stackTrace: ILog[] = [];
     fatalErrors: ILog[] = [];
 
-    /**
-     * Returns the singleton instance of the class.
-     * @returns {DOMHelperClass} The singleton instance.
-     */
     public static getInstance(): DOMHelperClass {
         if (!DOMHelperClass.instance) {
             DOMHelperClass.instance = new DOMHelperClass();

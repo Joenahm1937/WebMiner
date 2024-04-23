@@ -11,22 +11,18 @@ import { PageScriptCoordinator } from './PageScriptCoordinator';
 
 const PopupMessageHandler: MessageHandler<PopupMessage> = {
     processMessage(message, _, sendResponse) {
+        const handleControllerError = (error: Error) => {
+            if (error) sendResponse({ success: false, message: error.message });
+        };
         if (message.signal === 'UPDATE_SETTINGS') {
             PageScriptCoordinator.updateSettings({
                 enableStackTrace: message.payload.devMode,
             });
         } else if (message.signal === 'START') {
-            PageScriptCoordinator.startProcessing((error?: Error) => {
-                if (error) {
-                    sendResponse({ success: false, message: error.message });
-                } else {
-                    sendResponse({
-                        success: true,
-                    });
-                }
-            });
+            PageScriptCoordinator.startProcessing(handleControllerError);
             return true;
         } else if (message.signal === 'STOP') {
+            PageScriptCoordinator.stopProcessing(handleControllerError);
             sendResponse({ success: true });
         }
         return false;
