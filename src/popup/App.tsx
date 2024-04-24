@@ -7,7 +7,7 @@ import type {
 } from '../interfaces';
 import { useEffect, useState, useRef } from 'react';
 import logo from '/logo.svg';
-import settings from '/settings.svg';
+import settings from './assets/settings.svg';
 import './App.css';
 import {
     TOGGLE_RUNNING_STATE,

@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import fs from 'fs';
 
-const OUT_DIR = 'dist/popup'
+const OUT_DIR = 'dist/popup';
 
 export default defineConfig({
     base: '/popup',
@@ -24,11 +24,14 @@ export default defineConfig({
                             console.error('Error moving HTML file:', err);
                         }
 
-                        fs.rmSync(path.resolve(OUT_DIR, 'src'), { recursive: true, force: true })
+                        fs.rmSync(path.resolve(OUT_DIR, 'src'), {
+                            recursive: true,
+                            force: true,
+                        });
                     }
                 }
-            }
-        }
+            },
+        },
     ],
     build: {
         rollupOptions: {
