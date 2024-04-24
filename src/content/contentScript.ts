@@ -1,11 +1,15 @@
+import ReactDOM from 'react-dom';
 import type { ContentScriptMessage, UserScript, Message } from '../interfaces';
-// import { Modal } from './Modal';
+import Modal from './components/Modal';
+import React from 'react';
 
 const handleMessage = async (message: Message) => {
     if (message.source === 'Worker' && message.signal === 'START_PAGE_SCRIPT') {
         const {} = message.settings;
 
-        // Modal.create();
+        const appElement = document.createElement('div');
+        document.body.appendChild(appElement);
+        ReactDOM.render(React.createElement(Modal), appElement);
 
         const userScript: UserScript = {
             id: Math.random(),

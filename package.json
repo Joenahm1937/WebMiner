@@ -5,8 +5,12 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "watch": "vite & vite build --watch",
-        "build": "tsc && vite build",
+        "watch:content": "vite build --config vite.config.js --watch",
+        "watch:popup": "vite build --config vite.popup.config.js --watch",
+        "watch": "npm run watch:content & npm run watch:popup",
+        "build:content": "vite build --config vite.config.js",
+        "build:popup": "vite build --config vite.popup.config.js",
+        "build": "npm run build:content && npm run build:popup",
         "preview": "vite preview",
         "clean": "rm -rf dist"
     },
@@ -16,6 +20,7 @@
     },
     "devDependencies": {
         "@types/chrome": "^0.0.262",
+        "@types/node": "^20.12.7",
         "@types/react": "^18.2.61",
         "@types/react-dom": "^18.2.19",
         "@vitejs/plugin-react": "^4.2.1",

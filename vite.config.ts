@@ -1,3 +1,4 @@
+// vite.config.js for content script and service worker
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -8,7 +9,6 @@ export default defineConfig({
             input: {
                 serviceWorker: 'src/background/serviceWorker.ts',
                 contentScript: 'src/content/contentScript.ts',
-                popup: 'index.html',
             },
             output: {
                 entryFileNames: `[name].js`,
