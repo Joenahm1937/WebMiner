@@ -4,15 +4,11 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "vite",
-        "watch:content": "vite build --config vite.config.js --watch",
-        "watch:popup": "vite build --config vite.popup.config.js --watch",
-        "watch": "npm run watch:content & npm run watch:popup",
-        "build:content": "vite build --config vite.config.js",
-        "build:popup": "vite build --config vite.popup.config.js",
-        "build": "npm run build:content && npm run build:popup",
-        "preview": "vite preview",
-        "clean": "rm -rf dist"
+        "build:main": "vite build --config vite.config.js",
+        "build:content": "vite build --config vite.content.config.js",
+        "build": "npm run clean && npm run build:main && npm run build:content",
+        "watch": "chokidar 'src/**/*' -c 'npm run build'",
+        "clean": "rm -rf dist && mkdir dist && mkdir dist/content"
     },
     "dependencies": {
         "react": "^18.2.0",
@@ -24,6 +20,7 @@
         "@types/react": "^18.2.61",
         "@types/react-dom": "^18.2.19",
         "@vitejs/plugin-react": "^4.2.1",
+        "chokidar-cli": "^3.0.0",
         "typescript": "^5.2.2",
         "vite": "^5.1.4"
     }

@@ -35,7 +35,7 @@ class PageScriptCoordinatorClass {
                     chrome.scripting.executeScript(
                         {
                             target: { tabId: currentTab.id },
-                            files: ['contentScript.js'],
+                            files: ['content/contentScript.js'],
                         },
                         () => {
                             const message: WorkerScriptContextMessage = {

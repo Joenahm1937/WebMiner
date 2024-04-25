@@ -6,7 +6,7 @@ import type {
     ResponseMessage,
 } from '../interfaces';
 import { useEffect, useState, useRef } from 'react';
-import logo from '/logo.svg';
+import logo from './assets/logo.svg';
 import settings from './assets/settings.svg';
 import './App.css';
 import {
