@@ -8,7 +8,7 @@ export default defineConfig({
     build: {
         rollupOptions: {
             input: {
-                contentScript: 'src/content/contentScript.ts',
+                contentScript: 'src/content/contentScript.tsx',
             },
             output: {
                 entryFileNames: `[name].js`,

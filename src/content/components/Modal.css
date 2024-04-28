@@ -1,0 +1,38 @@
+#unique-modal-id *,
+#unique-modal-id *::before,
+#unique-modal-id *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+#unique-modal-id {
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: white;
+    border: 1px solid black;
+    padding: 20px;
+    color: black;
+    font-size: 16px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+#unique-modal-id button {
+    font-size: 16px;
+    padding: 5px 10px;
+}
+
+#unique-modal-id h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+#unique-modal-id p {
+    font-size: 16px;
+}
