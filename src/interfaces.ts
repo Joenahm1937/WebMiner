@@ -86,7 +86,7 @@ export interface UserScript extends SerializableObject {
 }
 
 export interface ILocalStorage {
-    isRunning: boolean;
+    isCreating: boolean;
     userScripts: UserScript[];
     devMode: boolean;
 }

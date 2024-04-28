@@ -9,8 +9,8 @@ export const ContentScriptSignals = {
 } as const;
 
 export const PopupSignals = {
-    Start: 'START',
-    Stop: 'STOP',
+    Creating: 'CREATE',
+    Completing: 'COMPLETE',
     Restart: 'RESTART',
     UpdateSettings: 'UPDATE_SETTINGS',
 } as const;

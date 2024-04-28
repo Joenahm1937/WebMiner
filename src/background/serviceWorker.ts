@@ -18,10 +18,10 @@ const PopupMessageHandler: MessageHandler<PopupMessage> = {
             PageScriptCoordinator.updateSettings({
                 enableStackTrace: message.payload.devMode,
             });
-        } else if (message.signal === 'START') {
+        } else if (message.signal === 'CREATE') {
             PageScriptCoordinator.startProcessing(handleControllerError);
             return true;
-        } else if (message.signal === 'STOP') {
+        } else if (message.signal === 'COMPLETE') {
             PageScriptCoordinator.stopProcessing(handleControllerError);
             sendResponse({ success: true });
         }
