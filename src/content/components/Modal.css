@@ -1,13 +1,13 @@
-#unique-modal-id *,
-#unique-modal-id *::before,
-#unique-modal-id *::after {
+#web-miner-modal *,
+#web-miner-modal *::before,
+#web-miner-modal *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: Arial, sans-serif;
 }
 
-#unique-modal-id {
+#web-miner-modal {
     position: fixed;
     top: 10%;
     left: 50%;
@@ -23,16 +23,16 @@
     border-radius: 10px;
 }
 
-#unique-modal-id button {
+#web-miner-modal button {
     font-size: 16px;
     padding: 5px 10px;
 }
 
-#unique-modal-id h1 {
+#web-miner-modal h1 {
     font-size: 24px;
     margin-bottom: 10px;
 }
 
-#unique-modal-id p {
+#web-miner-modal p {
     font-size: 16px;
 }

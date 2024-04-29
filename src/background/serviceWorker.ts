@@ -41,11 +41,6 @@ const ContentScriptMessageHandler: MessageHandler<ContentScriptMessage> = {
         userScripts.push(userScript);
         await LocalStorageWrapper.set('userScripts', userScripts);
         await LocalStorageWrapper.set('isCreating', false);
-        /**
-         * If the user ends script creation from the modal and not the popup (supported behavior),
-         * the next line will cause the `Could not establish connection. Receiving end does not exist.` error.
-         * This is because the Popup is not open to receive this message. This is expected behavior.
-         */
         const workerMessage: WorkerMessage = {
             source: 'Worker',
             signal: 'REFRESH_POPUP',

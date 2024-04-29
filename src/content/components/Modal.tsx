@@ -1,78 +1,106 @@
-import { useCallback, useEffect, useState } from 'react';
 import './Modal.css';
+import { useCallback, useEffect, useState } from 'react';
 import Draggable from 'react-draggable';
-import { tearDown } from '../utils';
+
+const MODAL_ID = 'web-miner-modal';
+/**
+ * The CSS for highlighting elements on hover
+ */
+const HIGHLIGHT_STYLE = '3px solid red';
+
+const updateElementOutline = (element: HTMLElement, style: string) => {
+    element.style.outline = style;
+};
+
+const getDetailedAttributes = (element: HTMLElement): string => {
+    let attributes: Record<string, string> = {};
+    Array.from(element.attributes).forEach((attr) => {
+        attributes[attr.name] = attr.value;
+    });
+    return JSON.stringify(attributes);
+};
+
+const isModalElement = (element: HTMLElement) => {
+    const modal = document.getElementById(MODAL_ID) as HTMLElement;
+    return modal.contains(element);
+};
 
 const Modal = () => {
-    const [isHighlighting, setIsHighlighting] = useState(false);
-    const [highlightedNodeInfo, setHighlightedNodeInfo] = useState('');
+    const [isPicking, setIsPicking] = useState(false);
+    const [highlightedNode, setHighlightedNode] = useState('');
     const [selectedNode, setSelectedNode] = useState<string>();
 
-    const highlightStyle = '3px solid red'; // The CSS for highlighting elements
-
     const handleMouseOver = useCallback((event: Event) => {
-        const node = event.target as HTMLElement;
-        node.style.outline = highlightStyle;
-        setHighlightedNodeInfo(
-            `Tag: ${node.tagName}, Class: ${node.className}`
-        );
+        const element = event.target as HTMLElement;
+        if (isModalElement(element)) return;
+        updateElementOutline(element, HIGHLIGHT_STYLE);
+        setHighlightedNode(getDetailedAttributes(element));
     }, []);
 
     const handleMouseOut = useCallback((event: Event) => {
-        const node = event.target as HTMLElement;
-        node.style.outline = '';
-        setHighlightedNodeInfo('');
+        const element = event.target as HTMLElement;
+        if (isModalElement(element)) return;
+        updateElementOutline(element, '');
     }, []);
 
     const handleNodeSelect = useCallback((event: Event) => {
-        const node = event.target as HTMLElement;
-        const modal = document.getElementById('unique-modal-id');
-        // We do not want to overwrite the click handler of the stop picking nodes button obv
-        if (modal?.contains(node)) return;
-        event.stopPropagation(); // Prevent the event from bubbling to avoid unintended interactions
-        setSelectedNode(node.outerHTML);
-        toggleHighlight();
+        const element = event.target as HTMLElement;
+        if (isModalElement(element)) return;
+
+        element.removeAttribute('onclick');
+        event.preventDefault();
+
+        setSelectedNode(getDetailedAttributes(element));
+        exitPickingState();
+        element.style.outline = '';
     }, []);
 
+    const enterPickingState = () => {
+        document.querySelectorAll('*').forEach((element) => {
+            document.body.style.cursor = `url('http://wiki-devel.sugarlabs.org/images/e/e2/Arrow.cur'), auto`;
+            element.addEventListener('mouseover', handleMouseOver);
+            element.addEventListener('mouseout', handleMouseOut);
+            /**
+             * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#usecapture
+             * Events will be dispatched to the registered listener before being dispatched to any EventTarget beneath it in the DOM tree
+             */
+            element.addEventListener('click', handleNodeSelect, true);
+        });
+        setIsPicking(true);
+    };
+
+    const exitPickingState = () => {
+        document.body.style.cursor = 'auto';
+        document.querySelectorAll('*').forEach((element) => {
+            element.removeEventListener('mouseover', handleMouseOver);
+            element.removeEventListener('mouseout', handleMouseOut);
+            element.removeEventListener('click', handleNodeSelect);
+        });
+        setIsPicking(false);
+        setHighlightedNode('');
+    };
+
     useEffect(() => {
-        return () => {
-            document.querySelectorAll('*').forEach((element) => {
-                element.removeEventListener('mouseover', handleMouseOver);
-                element.removeEventListener('mouseout', handleMouseOut);
-                element.removeEventListener('click', handleNodeSelect);
-            });
-        };
+        return exitPickingState;
     }, []);
-    // Toggle the highlighting functionality
-    const toggleHighlight = () => {
-        if (!isHighlighting) {
-            document.querySelectorAll('*').forEach((element) => {
-                element.addEventListener('mouseover', handleMouseOver);
-                element.addEventListener('mouseout', handleMouseOut);
-                element.addEventListener('click', handleNodeSelect);
-            });
+
+    const togglePickingState = () => {
+        if (!isPicking) {
+            enterPickingState();
         } else {
-            document.querySelectorAll('*').forEach((element) => {
-                element.removeEventListener('mouseover', handleMouseOver);
-                element.removeEventListener('mouseout', handleMouseOut);
-                element.removeEventListener('click', handleNodeSelect);
-            });
+            exitPickingState();
         }
-        setIsHighlighting(!isHighlighting);
     };
 
     return (
         <Draggable>
-            <div id="unique-modal-id">
-                <button onClick={tearDown}>Close</button>
-                <button onClick={toggleHighlight}>
-                    {isHighlighting ? 'Stop Picking Nodes' : 'Pick Nodes'}
+            <div id={MODAL_ID}>
+                <button onClick={togglePickingState}>
+                    {isPicking ? 'Stop Picking Nodes' : 'Pick Nodes'}
                 </button>
                 <h1>Draggable Modal</h1>
                 <p>This is a draggable modal. You can move it around!</p>
-                {highlightedNodeInfo && (
-                    <p>Highlighted Node: {highlightedNodeInfo}</p>
-                )}
+                {highlightedNode && <p>Highlighted Node: {highlightedNode}</p>}
                 {selectedNode && (
                     <div>
                         <h2>Selected Node:</h2>
