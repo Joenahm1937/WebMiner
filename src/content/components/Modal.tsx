@@ -49,6 +49,7 @@ const Modal = () => {
 
         element.removeAttribute('onclick');
         event.preventDefault();
+        event.stopImmediatePropagation();
 
         setSelectedNode(getDetailedAttributes(element));
         exitPickingState();
@@ -74,7 +75,7 @@ const Modal = () => {
         document.querySelectorAll('*').forEach((element) => {
             element.removeEventListener('mouseover', handleMouseOver);
             element.removeEventListener('mouseout', handleMouseOut);
-            element.removeEventListener('click', handleNodeSelect);
+            element.removeEventListener('click', handleNodeSelect, true);
         });
         setIsPicking(false);
         setHighlightedNode('');
