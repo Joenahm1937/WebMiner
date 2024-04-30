@@ -47,7 +47,6 @@ const Modal = () => {
         const element = event.target as HTMLElement;
         if (isModalElement(element)) return;
 
-        element.removeAttribute('onclick');
         event.preventDefault();
         event.stopImmediatePropagation();
 
@@ -57,26 +56,23 @@ const Modal = () => {
     }, []);
 
     const enterPickingState = () => {
-        document.querySelectorAll('*').forEach((element) => {
-            document.body.style.cursor = `url('http://wiki-devel.sugarlabs.org/images/e/e2/Arrow.cur'), auto`;
-            element.addEventListener('mouseover', handleMouseOver);
-            element.addEventListener('mouseout', handleMouseOut);
-            /**
-             * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#usecapture
-             * Events will be dispatched to the registered listener before being dispatched to any EventTarget beneath it in the DOM tree
-             */
-            element.addEventListener('click', handleNodeSelect, true);
-        });
+        setSelectedNode('');
+        document.body.style.cursor = `url('http://wiki-devel.sugarlabs.org/images/e/e2/Arrow.cur'), auto`;
+        document.addEventListener('mouseover', handleMouseOver);
+        document.addEventListener('mouseout', handleMouseOut);
+        /**
+         * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#usecapture
+         * Events will be dispatched to the registered listener before being dispatched to any EventTarget beneath it in the DOM tree
+         */
+        document.addEventListener('click', handleNodeSelect, true);
         setIsPicking(true);
     };
 
     const exitPickingState = () => {
         document.body.style.cursor = 'auto';
-        document.querySelectorAll('*').forEach((element) => {
-            element.removeEventListener('mouseover', handleMouseOver);
-            element.removeEventListener('mouseout', handleMouseOut);
-            element.removeEventListener('click', handleNodeSelect, true);
-        });
+        document.removeEventListener('mouseover', handleMouseOver);
+        document.removeEventListener('mouseout', handleMouseOut);
+        document.removeEventListener('click', handleNodeSelect, true);
         setIsPicking(false);
         setHighlightedNode('');
     };
@@ -99,8 +95,6 @@ const Modal = () => {
                 <button onClick={togglePickingState}>
                     {isPicking ? 'Stop Picking Nodes' : 'Pick Nodes'}
                 </button>
-                <h1>Draggable Modal</h1>
-                <p>This is a draggable modal. You can move it around!</p>
                 {highlightedNode && <p>Highlighted Node: {highlightedNode}</p>}
                 {selectedNode && (
                     <div>
