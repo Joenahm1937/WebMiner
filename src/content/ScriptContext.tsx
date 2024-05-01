@@ -14,9 +14,11 @@ interface ScriptContextType {
     steps: ScriptStep[];
     addStep: (newStep: ScriptStep) => void;
     updateStep: (index: number, newStep: ScriptStep) => void;
+    updateStepElement: (index: number, newElement: string) => void;
+    updateStepCommand: (index: number, newCommand: string) => void;
     removeStep: (index: number) => void;
-    nodePickingStep?: number;
-    setNodePickingStep: Dispatch<SetStateAction<number | undefined>>;
+    elementPickingStep?: number;
+    setElementPickingStep: Dispatch<SetStateAction<number | undefined>>;
 }
 
 const ScriptContext = createContext<ScriptContextType | undefined>(undefined);
@@ -25,10 +27,15 @@ interface ScriptProviderProps {
     children: ReactNode;
 }
 
+// TODO: Begin Updating Local Storage with Added, Updated, and Remove Steps
 export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
     const [name, setName] = useState<string>('');
-    const [steps, setSteps] = useState<ScriptStep[]>([]);
-    const [nodePickingStep, setNodePickingStep] = useState<
+    // Placeholder Values (Loaded from Local Storage)
+    const [steps, setSteps] = useState<ScriptStep[]>([
+        { element: 'test element', command: 'Click' },
+        { element: 'test element 2', command: 'Input Text' },
+    ]);
+    const [elementPickingStep, setElementPickingStep] = useState<
         number | undefined
     >();
 
@@ -42,6 +49,22 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
         );
     };
 
+    const updateStepElement = (index: number, newElement: string) => {
+        setSteps((prevSteps) =>
+            prevSteps.map((step, i) =>
+                i === index ? { ...step, element: newElement } : step
+            )
+        );
+    };
+
+    const updateStepCommand = (index: number, newCommand: string) => {
+        setSteps((prevSteps) =>
+            prevSteps.map((step, i) =>
+                i === index ? { ...step, command: newCommand } : step
+            )
+        );
+    };
+
     const removeStep = (index: number) => {
         setSteps((prevSteps) => prevSteps.filter((_, i) => i !== index));
     };
@@ -52,9 +75,11 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
         steps,
         addStep,
         updateStep,
+        updateStepElement,
+        updateStepCommand,
         removeStep,
-        nodePickingStep,
-        setNodePickingStep,
+        elementPickingStep,
+        setElementPickingStep,
     };
 
     return (

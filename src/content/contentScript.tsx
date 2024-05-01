@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import Modal from './components/Modal';
 import type { Message } from '../interfaces';
-import { tearDown } from './utils';
+import { tearDownModal } from './utils';
 import { ScriptProvider } from './ScriptContext';
 
 const handleMessage = async (message: Message) => {
@@ -20,7 +20,7 @@ const handleMessage = async (message: Message) => {
                 }
                 break;
             case 'STOP_PAGE_SCRIPT':
-                tearDown();
+                tearDownModal();
                 break;
         }
     }
