@@ -2,12 +2,6 @@ import ReactDOM from 'react-dom';
 import { UserScript, ContentScriptMessage } from '../interfaces';
 import { MODAL_ID } from './constants';
 
-declare global {
-    interface Window {
-        myModalElement?: HTMLElement;
-    }
-}
-
 export const tearDownModal = () => {
     if (window.myModalElement) {
         const scriptNodes: UserScript = {
