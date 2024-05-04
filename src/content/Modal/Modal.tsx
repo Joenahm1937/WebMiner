@@ -1,8 +1,8 @@
 import './Modal.css';
 import Draggable from 'react-draggable';
-import ElementPicker from './ElementPicker';
+import ElementSelector from '../ElementSelector/ElementSelector';
 import { useScriptContext } from '../ScriptContext';
-import Script from './Script';
+import Script from '../ScriptBuilder/Script';
 import { MODAL_ID } from '../constants';
 
 const Modal = () => {
@@ -13,7 +13,7 @@ const Modal = () => {
                 {elementPickingStep === undefined ? (
                     <Script />
                 ) : (
-                    <ElementPicker />
+                    <ElementSelector />
                 )}
             </div>
         </Draggable>

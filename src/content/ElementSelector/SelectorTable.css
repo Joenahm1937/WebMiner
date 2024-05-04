@@ -1,0 +1,40 @@
+.element-selector-container {
+    width: 90%; /* A bit narrower for better aesthetics */
+    margin: 20px auto;
+    padding: 20px; /* Added some padding around the container */
+    border: 1px solid #ccc; /* Subtle border to define the component */
+    border-radius: 8px; /* Rounded corners for a polished look */
+    background-color: #f9f9f9; /* Light background to distinguish the table */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.element-selector-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.element-selector-table td {
+    border-bottom: 1px solid #ddd; /* Bottom border for row separation */
+    padding: 16px 12px;
+    text-align: left;
+}
+
+.element-selector-table .selection:hover {
+    cursor: pointer;
+    background-color: #f1f1f1; /* Slight hover effect for interactivity */
+}
+
+.element-selector-table .selection.active {
+    background-color: #d1e7ff; /* Light blue for active state */
+}
+
+.label {
+    font-weight: bold;
+    color: #333; /* Darker color for better contrast */
+}
+
+.value {
+    word-break: break-word; /* Allows breaking long words gracefully */
+    font-style: italic;
+    color: #555; /* Different color to distinguish value from label */
+}

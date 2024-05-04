@@ -1,11 +1,12 @@
+import {
+    ElementIdentifier,
+    createCSSSelector,
+    getElementIdentifiers,
+} from './utils';
 import { useScriptContext } from '../ScriptContext';
 import { HIGHLIGHT_STYLE } from '../constants';
-import {
-    isModalElement,
-    updateElementOutline,
-    getDetailedAttributes,
-} from '../utils';
-import './Modal.css';
+import { isModalElement, updateElementOutline } from '../utils';
+import SelectorTable from './SelectorTable';
 import { useCallback, useEffect, useState } from 'react';
 
 const ElementPicker = () => {
@@ -13,14 +14,19 @@ const ElementPicker = () => {
         useScriptContext();
 
     const [isPicking, setIsPicking] = useState(false);
-    const [highlightedElement, setHighlightedElement] = useState('');
-    const [selectedElement, setSelectedElement] = useState('');
+    const [highlightedElement, setHighlightedElement] = useState<
+        ElementIdentifier | undefined
+    >();
+    const [selectedIdentifiers, setSelectedIdentifiers] =
+        useState<ElementIdentifier>({});
+
+    const selector = createCSSSelector(selectedIdentifiers);
 
     const handleMouseOver = useCallback((event: Event) => {
         const element = event.target as HTMLElement;
         if (isModalElement(element)) return;
         updateElementOutline(element, HIGHLIGHT_STYLE);
-        setHighlightedElement(getDetailedAttributes(element));
+        setHighlightedElement(getElementIdentifiers(element));
     }, []);
 
     const handleMouseOut = useCallback((event: Event) => {
@@ -40,12 +46,10 @@ const ElementPicker = () => {
         const element = event.target as HTMLElement;
         if (isModalElement(element)) return;
         element.style.outline = '';
-        setSelectedElement(getDetailedAttributes(element));
         exitPickingState();
     }, []);
 
     const enterPickingState = () => {
-        setSelectedElement('');
         document.body.style.cursor = `url('http://wiki-devel.sugarlabs.org/images/e/e2/Arrow.cur'), auto`;
         /**
          * Disabling Clicks while Picking Element
@@ -66,13 +70,12 @@ const ElementPicker = () => {
         document.removeEventListener('mouseout', handleMouseOut);
         document.removeEventListener('pointerup', handlePointerUp);
         setIsPicking(false);
-        setHighlightedElement('');
     };
 
     const confirmPickedElement = () => {
         document.removeEventListener('click', disableClicks, true);
         // Casting to Number because the only way we can see this view is if elementPickingStep is defined
-        updateStepElement(elementPickingStep as number, selectedElement);
+        // updateStepElement(elementPickingStep as number, selectedElement);
         setElementPickingStep(undefined);
     };
 
@@ -90,14 +93,12 @@ const ElementPicker = () => {
             {!isPicking && (
                 <button onClick={confirmPickedElement}>Confirm</button>
             )}
+            <p>{selector.selector}</p>
             {highlightedElement && (
-                <p>Highlighted Element: {highlightedElement}</p>
-            )}
-            {selectedElement && (
-                <div>
-                    <h2>Selected Element:</h2>
-                    <p>{selectedElement}</p>
-                </div>
+                <SelectorTable
+                    identifier={highlightedElement}
+                    setSelectedIdentifiers={setSelectedIdentifiers}
+                />
             )}
         </div>
     );

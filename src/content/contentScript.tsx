@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom';
-import Modal from './components/Modal';
+import Modal from './Modal/Modal';
 import type { Message } from '../interfaces';
 import { tearDownModal } from './utils';
 import { ScriptProvider } from './ScriptContext';
