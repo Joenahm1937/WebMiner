@@ -1,13 +1,10 @@
-import {
-    ElementIdentifier,
-    createCSSSelector,
-    getElementIdentifiers,
-} from './utils';
+import { createCSSSelector, getElementIdentifiers } from './utils';
 import { useScriptContext } from '../ScriptContext';
 import { HIGHLIGHT_STYLE } from '../constants';
 import { isModalElement, updateElementOutline } from '../utils';
 import SelectorTable from './SelectorTable';
 import { useCallback, useEffect, useState } from 'react';
+import { ElementIdentifier } from '../interfaces';
 
 const ElementPicker = () => {
     const { updateStepElement, elementPickingStep, setElementPickingStep } =

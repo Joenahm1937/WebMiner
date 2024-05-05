@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import {
-    ElementIdentifier,
-    ElementIdentifierTypes,
-    PrimitiveIdentifierTypes,
-    trimString,
-} from './utils';
+import { trimString } from './utils';
 import './SelectorTable.css';
+import {
+    ElementIdentifierTypes,
+    ElementIdentifier,
+    PrimitiveIdentifierTypes,
+} from '../interfaces';
 
 const SPECIAL_SELECTORS = new Set<ElementIdentifierTypes>([
     'id',

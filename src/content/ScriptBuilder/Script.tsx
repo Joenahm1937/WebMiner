@@ -1,4 +1,4 @@
-import Step from './Step';
+import StepCard from './StepCard';
 import { useScriptContext } from '../ScriptContext';
 
 const Script: React.FC = () => {
@@ -7,7 +7,7 @@ const Script: React.FC = () => {
     return (
         <div>
             {steps.map((step, stepNumber) => (
-                <Step
+                <StepCard
                     key={stepNumber}
                     stepNumber={stepNumber}
                     element={step.element}

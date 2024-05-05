@@ -6,8 +6,7 @@ import React, {
     useContext,
     useState,
 } from 'react';
-import { ScriptStep } from './interfaces';
-import { SelectorResult } from './ElementSelector/utils';
+import { ScriptStep, SelectorResult } from './interfaces';
 
 interface ScriptContextType {
     name: string;
