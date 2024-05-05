@@ -1,0 +1,46 @@
+/* Container styling for the AddCard */
+.add-card-container {
+    border: 2px dashed #c0c0c0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 16px;
+    background-color: #fafafa;
+    text-align: center;
+    cursor: pointer;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.add-card-container:hover {
+    border-color: #b0b0b0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Button styling specifically for the add card button */
+.add-card-button {
+    padding: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2em;
+}
+
+/* Add Card text details */
+.add-card-details {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #555;
+}
+
+/* Error banner styling */
+.error-banner {
+    background-color: #ffdddd;
+    border: 1px solid #ffcccc;
+    border-radius: 8px;
+    color: #a94442;
+    padding: 8px;
+    margin-bottom: 16px;
+    text-align: center;
+    font-weight: bold;
+}

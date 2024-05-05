@@ -5,8 +5,8 @@ declare global {
 }
 
 export interface ScriptStep {
-    element: SelectorResult;
-    command: string;
+    element?: SelectorResult;
+    command?: string;
 }
 
 export interface ElementIdentifier {

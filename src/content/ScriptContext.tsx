@@ -19,6 +19,7 @@ interface ScriptContextType {
     removeStep: (index: number) => void;
     elementPickingStep?: number;
     setElementPickingStep: Dispatch<SetStateAction<number | undefined>>;
+    canExecuteScript: () => boolean;
 }
 
 const ScriptContext = createContext<ScriptContextType | undefined>(undefined);
@@ -31,22 +32,7 @@ interface ScriptProviderProps {
 export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
     const [name, setName] = useState<string>('');
     // Placeholder Values (Loaded from Local Storage)
-    const [steps, setSteps] = useState<ScriptStep[]>([
-        {
-            element: {
-                selector: 'someText',
-                searchAPI: 'getElementsByText',
-            },
-            command: 'Click',
-        },
-        {
-            element: {
-                selector: 'p:nth-child(1)',
-                searchAPI: 'querySelector',
-            },
-            command: 'Input Text',
-        },
-    ]);
+    const [steps, setSteps] = useState<ScriptStep[]>([]);
     const [elementPickingStep, setElementPickingStep] = useState<
         number | undefined
     >();
@@ -81,6 +67,13 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
         setSteps((prevSteps) => prevSteps.filter((_, i) => i !== index));
     };
 
+    const canExecuteScript = (): boolean => {
+        // Check each step for undefined element or command
+        return steps.every(
+            (step) => step.element !== undefined && step.command !== undefined
+        );
+    };
+
     const value = {
         name,
         setName,
@@ -92,6 +85,7 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
         removeStep,
         elementPickingStep,
         setElementPickingStep,
+        canExecuteScript,
     };
 
     return (

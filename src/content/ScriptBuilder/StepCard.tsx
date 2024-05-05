@@ -7,10 +7,21 @@ interface StepProps extends ScriptStep {
 }
 
 const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
-    const { setElementPickingStep } = useScriptContext();
+    const { setElementPickingStep, updateStepCommand } = useScriptContext();
     const enterPickingMode = () => {
         setElementPickingStep(stepNumber);
     };
+
+    const handleCommandChange = (
+        event: React.ChangeEvent<HTMLSelectElement>
+    ) => {
+        const newCommand = event.target.value;
+        updateStepCommand(stepNumber, newCommand);
+    };
+
+    const selectorText = element?.selector || 'Select Element';
+    const isElementMissing = !element;
+    const isCommandMissing = command === undefined;
 
     return (
         <div className="step-card-container">
@@ -20,12 +31,25 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
                 </span>
             </button>
             <div className="step-details">
-                <div className="step-selector-text">{element.selector}</div>
+                <div
+                    className={
+                        isElementMissing
+                            ? 'placeholder-text'
+                            : 'step-selector-text'
+                    }
+                >
+                    {selectorText}
+                </div>
                 <select
                     className="step-command-select"
-                    value={command}
-                    onChange={(e) => console.log(e.target.value)}
+                    value={command ?? ''}
+                    onChange={handleCommandChange}
                 >
+                    {isCommandMissing && (
+                        <option disabled value="">
+                            Select Command
+                        </option>
+                    )}
                     <option value="Click">Click</option>
                     <option value="Input Text">Input Text</option>
                 </select>

@@ -1,4 +1,5 @@
 import StepCard from './StepCard';
+import AddCard from './AddCard';
 import { useScriptContext } from '../ScriptContext';
 
 const Script: React.FC = () => {
@@ -14,6 +15,7 @@ const Script: React.FC = () => {
                     command={step.command}
                 />
             ))}
+            <AddCard />
         </div>
     );
 };
