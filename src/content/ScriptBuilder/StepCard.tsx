@@ -2,14 +2,15 @@ import './StepCard.css';
 import { useScriptContext } from '../ScriptContext';
 import { ScriptStep } from '../interfaces';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowPointer } from '@fortawesome/free-solid-svg-icons';
+import { faArrowPointer, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 interface StepProps extends ScriptStep {
     stepNumber: number;
 }
 
 const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
-    const { setElementPickingStep, updateStepCommand } = useScriptContext();
+    const { setElementPickingStep, updateStepCommand, removeStep } =
+        useScriptContext();
     const enterPickingMode = () => {
         setElementPickingStep(stepNumber);
     };
@@ -21,15 +22,27 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
         updateStepCommand(stepNumber, newCommand);
     };
 
+    const handleDeleteClick = () => {
+        removeStep(stepNumber);
+    };
+
     const selectorText = element?.selector || 'Select Element';
     const isElementMissing = !element;
     const isCommandMissing = command === undefined;
 
     return (
         <div className="step-card-container">
-            <button className="step-pick-button" onClick={enterPickingMode}>
-                <FontAwesomeIcon icon={faArrowPointer} className="fa-lg" />
-            </button>
+            <div className="step-card-header">
+                <button className="step-pick-button" onClick={enterPickingMode}>
+                    <FontAwesomeIcon icon={faArrowPointer} className="fa-lg" />
+                </button>
+                <button
+                    className="step-delete-button"
+                    onClick={handleDeleteClick}
+                >
+                    <FontAwesomeIcon icon={faTrash} className="fa-lg" />
+                </button>
+            </div>
             <div className="step-details">
                 <div
                     className={
