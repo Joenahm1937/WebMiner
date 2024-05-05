@@ -1,6 +1,8 @@
 import './StepCard.css';
 import { useScriptContext } from '../ScriptContext';
 import { ScriptStep } from '../interfaces';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowPointer } from '@fortawesome/free-solid-svg-icons';
 
 interface StepProps extends ScriptStep {
     stepNumber: number;
@@ -26,9 +28,7 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
     return (
         <div className="step-card-container">
             <button className="step-pick-button" onClick={enterPickingMode}>
-                <span role="img" aria-label="pick">
-                    🔍
-                </span>
+                <FontAwesomeIcon icon={faArrowPointer} className="fa-lg" />
             </button>
             <div className="step-details">
                 <div

@@ -2,10 +2,7 @@
 .step-card-container {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    padding: 16px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 16px;
-    background-color: #fff;
     transition: box-shadow 0.2s;
 }
 
@@ -15,8 +12,6 @@
 
 /* Button styling for the pick button */
 .step-pick-button {
-    margin-right: 10px;
-    padding: 6px 12px;
     background-color: #f0f0f0;
     border: none;
     border-radius: 4px;
@@ -32,7 +27,7 @@
 .step-details {
     display: flex;
     align-items: center;
-    margin-top: 10px;
+    padding: 10px;
     justify-content: space-between;
 }
 
@@ -51,9 +46,12 @@
 
 /* Styling for the command dropdown */
 .step-command-select {
-    padding: 6px;
+    padding: 6px 28px 6px 6px;
     border-radius: 4px;
     border: 1px solid #ccc;
     background-color: #fff;
     cursor: pointer;
+    color: black;
+    width: auto;
+    white-space: nowrap;
 }

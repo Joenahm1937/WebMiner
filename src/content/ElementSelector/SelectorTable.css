@@ -1,21 +1,13 @@
-.element-selector-container {
-    width: 90%; /* A bit narrower for better aesthetics */
-    margin: 20px auto;
-    padding: 20px; /* Added some padding around the container */
-    border: 1px solid #ccc; /* Subtle border to define the component */
-    border-radius: 8px; /* Rounded corners for a polished look */
-    background-color: #f9f9f9; /* Light background to distinguish the table */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+.element-selector-container tr * {
+    border: none; /* Force removal of borders */
 }
 
-.element-selector-table {
-    width: 100%;
-    border-collapse: collapse;
+.element-selector-container {
+    padding: 20px; /* Added some padding around the container */
 }
 
 .element-selector-table td {
-    border-bottom: 1px solid #ddd; /* Bottom border for row separation */
-    padding: 16px 12px;
+    padding: 12px;
     text-align: left;
 }
 
@@ -37,4 +29,9 @@
     word-break: break-word; /* Allows breaking long words gracefully */
     font-style: italic;
     color: #555; /* Different color to distinguish value from label */
+}
+
+.element-selector-table .class-name,
+.element-selector-table .attribute-name {
+    padding-left: 40px;
 }

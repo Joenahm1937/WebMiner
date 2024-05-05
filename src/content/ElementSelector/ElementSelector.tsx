@@ -5,6 +5,9 @@ import { isModalElement, updateElementOutline } from '../utils';
 import SelectorTable from './SelectorTable';
 import { useCallback, useEffect, useState } from 'react';
 import { ElementIdentifier } from '../interfaces';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSyncAlt, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import './ElementSelector.css';
 
 const ElementPicker = () => {
     const { updateStepElement, elementPickingStep, setElementPickingStep } =
@@ -85,26 +88,46 @@ const ElementPicker = () => {
     }, []);
 
     return (
-        <div>
-            {!isPicking && <button onClick={enterPickingState}>Retry</button>}
-            {!isPicking && selector.selector.length ? (
-                <button onClick={confirmPickedElement}>Confirm</button>
-            ) : null}
-            {!isPicking && (
-                <p>
-                    {selector.selector.length
-                        ? selector.selector
-                        : 'Please choose from the given identifiers:'}
-                </p>
-            )}
-            {highlightedElement && (
-                <SelectorTable
-                    isPicking={isPicking}
-                    identifier={highlightedElement}
-                    selectedIdentifiers={selectedIdentifiers}
-                    setSelectedIdentifiers={setSelectedIdentifiers}
-                />
-            )}
+        <div className="element-selector">
+            <div className="overlay-controls">
+                {!isPicking && (
+                    <button
+                        className="retry-button"
+                        onClick={enterPickingState}
+                    >
+                        <FontAwesomeIcon icon={faSyncAlt} className="fa-lg" />
+                    </button>
+                )}
+                {!isPicking && selector.selector.length ? (
+                    <button
+                        className="confirm-button"
+                        onClick={confirmPickedElement}
+                    >
+                        <FontAwesomeIcon
+                            icon={faCheckCircle}
+                            className="fa-lg"
+                        />
+                    </button>
+                ) : null}
+            </div>
+
+            <div className="selector-content">
+                {!isPicking && (
+                    <div className="selector">
+                        {selector.selector.length
+                            ? `Your Selector: ${selector.selector}`
+                            : 'Please choose from the given identifiers:'}
+                    </div>
+                )}
+                {highlightedElement && (
+                    <SelectorTable
+                        isPicking={isPicking}
+                        identifier={highlightedElement}
+                        selectedIdentifiers={selectedIdentifiers}
+                        setSelectedIdentifiers={setSelectedIdentifiers}
+                    />
+                )}
+            </div>
         </div>
     );
 };

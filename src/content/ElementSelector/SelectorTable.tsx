@@ -231,7 +231,7 @@ const ClassNamesRow: React.FC<ClassNameProps> = ({
                     }`}
                     onClick={() => handleClassNameSelection(value)}
                 >
-                    <td colSpan={2} style={{ paddingLeft: '40%' }}>
+                    <td colSpan={2} className="class-name">
                         {trimString(value)}
                     </td>
                 </tr>
@@ -276,9 +276,7 @@ const AttributesRow: React.FC<AttributesProps> = ({
                         handleAttributeSelection(attribute, attributeValue)
                     }
                 >
-                    <td className="label" style={{ paddingLeft: '10%' }}>
-                        {attribute}
-                    </td>
+                    <td className="label attribute-name">{attribute}</td>
                     <td className="value">{trimString(attributeValue)}</td>
                 </tr>
             ))}

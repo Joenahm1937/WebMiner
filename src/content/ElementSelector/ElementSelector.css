@@ -1,0 +1,29 @@
+/* Overlay Control Styles */
+.element-selector .overlay-controls {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+    gap: 8px;
+}
+
+.element-selector .retry-button,
+.element-selector .confirm-button {
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.element-selector .retry-button:hover,
+.element-selector .confirm-button:hover {
+    background-color: #2980b9;
+}
+
+/* Main Content Styles */
+.element-selector .selector {
+    padding: 20px;
+    font-size: 16px;
+    color: #333;
+}
