@@ -7,6 +7,7 @@ import React, {
     useState,
 } from 'react';
 import { ScriptStep } from './interfaces';
+import { SelectorResult } from './ElementSelector/utils';
 
 interface ScriptContextType {
     name: string;
@@ -14,7 +15,7 @@ interface ScriptContextType {
     steps: ScriptStep[];
     addStep: (newStep: ScriptStep) => void;
     updateStep: (index: number, newStep: ScriptStep) => void;
-    updateStepElement: (index: number, newElement: string) => void;
+    updateStepElement: (index: number, newElement: SelectorResult) => void;
     updateStepCommand: (index: number, newCommand: string) => void;
     removeStep: (index: number) => void;
     elementPickingStep?: number;
@@ -32,8 +33,20 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
     const [name, setName] = useState<string>('');
     // Placeholder Values (Loaded from Local Storage)
     const [steps, setSteps] = useState<ScriptStep[]>([
-        { element: 'test element', command: 'Click' },
-        { element: 'test element 2', command: 'Input Text' },
+        {
+            element: {
+                selector: 'someText',
+                searchAPI: 'getElementsByText',
+            },
+            command: 'Click',
+        },
+        {
+            element: {
+                selector: 'p:nth-child(1)',
+                searchAPI: 'querySelector',
+            },
+            command: 'Input Text',
+        },
     ]);
     const [elementPickingStep, setElementPickingStep] = useState<
         number | undefined
@@ -49,7 +62,7 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
         );
     };
 
-    const updateStepElement = (index: number, newElement: string) => {
+    const updateStepElement = (index: number, newElement: SelectorResult) => {
         setSteps((prevSteps) =>
             prevSteps.map((step, i) =>
                 i === index ? { ...step, element: newElement } : step

@@ -1,3 +1,5 @@
+import { SelectorResult } from './ElementSelector/utils';
+
 declare global {
     interface Window {
         myModalElement?: HTMLElement;
@@ -5,6 +7,6 @@ declare global {
 }
 
 export interface ScriptStep {
-    element: string;
+    element: SelectorResult;
     command: string;
 }

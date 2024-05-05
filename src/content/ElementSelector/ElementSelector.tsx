@@ -75,7 +75,7 @@ const ElementPicker = () => {
     const confirmPickedElement = () => {
         document.removeEventListener('click', disableClicks, true);
         // Casting to Number because the only way we can see this view is if elementPickingStep is defined
-        // updateStepElement(elementPickingStep as number, selectedElement);
+        updateStepElement(elementPickingStep as number, selector);
         setElementPickingStep(undefined);
     };
 
@@ -90,13 +90,21 @@ const ElementPicker = () => {
     return (
         <div>
             {!isPicking && <button onClick={enterPickingState}>Retry</button>}
-            {!isPicking && (
+            {!isPicking && selector.selector.length ? (
                 <button onClick={confirmPickedElement}>Confirm</button>
+            ) : null}
+            {!isPicking && (
+                <p>
+                    {selector.selector.length
+                        ? selector.selector
+                        : 'Please choose from the given identifiers:'}
+                </p>
             )}
-            <p>{selector.selector}</p>
             {highlightedElement && (
                 <SelectorTable
+                    isPicking={isPicking}
                     identifier={highlightedElement}
+                    selectedIdentifiers={selectedIdentifiers}
                     setSelectedIdentifiers={setSelectedIdentifiers}
                 />
             )}

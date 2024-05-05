@@ -20,7 +20,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, element, command }) => {
                     marginBottom: '10px',
                 }}
             >
-                <div>{element}</div>
+                <div>{element.selector}</div>
                 <button
                     style={{ marginRight: '10px' }}
                     onClick={enterPickingMode}

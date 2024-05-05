@@ -1,4 +1,5 @@
 import { finder } from '@medv/finder';
+import { TEXT_LIMIT } from '../constants';
 
 /**
  * TODO:
@@ -44,7 +45,13 @@ export interface ElementIdentifier {
     uniqueSelector?: string;
 }
 
-interface SelectorResult {
+export type ElementIdentifierTypes = keyof ElementIdentifier;
+export type PrimitiveIdentifierTypes = Exclude<
+    ElementIdentifierTypes,
+    'attributes' | 'classNames'
+>;
+
+export interface SelectorResult {
     searchAPI: 'querySelector' | 'getElementById' | 'getElementsByText';
     selector: string;
 }
@@ -102,6 +109,13 @@ export const getElementIdentifiers = (
 export const createCSSSelector = (
     identifier: ElementIdentifier
 ): SelectorResult => {
+    if (identifier.id) {
+        return {
+            searchAPI: 'getElementById',
+            selector: identifier.id,
+        };
+    }
+
     if (identifier.uniqueSelector) {
         return {
             searchAPI: 'querySelector',
@@ -109,11 +123,10 @@ export const createCSSSelector = (
         };
     }
 
-    if (identifier.id) {
-        // If ID is present, use getElementById as it's more efficient for IDs.
+    if (identifier.textContent) {
         return {
-            searchAPI: 'getElementById',
-            selector: identifier.id,
+            searchAPI: 'getElementsByText',
+            selector: identifier.textContent,
         };
     }
 
@@ -155,17 +168,16 @@ export const createCSSSelector = (
         selectorParts.push(`[role="${identifier.role}"]`);
     }
 
-    // Text content requires a custom method or XPath, here we define a fictional method for example
-    if (identifier.textContent) {
-        return {
-            searchAPI: 'getElementsByText',
-            selector: identifier.textContent,
-        };
-    }
-
     // Construct and return the selector object
     return {
         searchAPI: 'querySelector',
         selector: selectorParts.join(' '),
     };
+};
+
+export const trimString = (input: string): string => {
+    if (input.length > TEXT_LIMIT) {
+        return input.substring(0, TEXT_LIMIT) + '...';
+    }
+    return input;
 };

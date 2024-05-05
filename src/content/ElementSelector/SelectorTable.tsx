@@ -1,82 +1,54 @@
 import React, { useState } from 'react';
-import { ElementIdentifier } from './utils';
+import {
+    ElementIdentifier,
+    ElementIdentifierTypes,
+    PrimitiveIdentifierTypes,
+    trimString,
+} from './utils';
 import './SelectorTable.css';
 
+const SPECIAL_SELECTORS = new Set<ElementIdentifierTypes>([
+    'id',
+    'textContent',
+    'uniqueSelector',
+]);
+
 interface SelectorTableProps {
+    isPicking: boolean;
     identifier: ElementIdentifier;
+    selectedIdentifiers: ElementIdentifier;
     setSelectedIdentifiers: React.Dispatch<
         React.SetStateAction<ElementIdentifier>
     >;
 }
 
 const SelectorTable: React.FC<SelectorTableProps> = ({
+    isPicking,
     identifier,
-    setSelectedIdentifiers,
-}) => (
-    <div className="element-selector-container">
-        <table className="element-selector-table">
-            <tbody>
-                {Object.entries(identifier).map(([key, value]) => {
-                    if (value !== undefined) {
-                        if (Array.isArray(value) && key === 'classNames') {
-                            return (
-                                <ClassNamesRow
-                                    key={key}
-                                    values={value}
-                                    setSelectedIdentifiers={
-                                        setSelectedIdentifiers
-                                    }
-                                />
-                            );
-                        }
-                        if (typeof value === 'object' && key === 'attributes') {
-                            return (
-                                <AttributesRow
-                                    value={value}
-                                    setSelectedIdentifiers={
-                                        setSelectedIdentifiers
-                                    }
-                                />
-                            );
-                        }
-                        return (
-                            <SimpleIdentifierRow
-                                label={
-                                    key as keyof Omit<
-                                        ElementIdentifier,
-                                        'attributes' | 'classNames'
-                                    >
-                                }
-                                value={value}
-                                setSelectedIdentifiers={setSelectedIdentifiers}
-                            />
-                        );
-                    }
-                    return null;
-                })}
-            </tbody>
-        </table>
-    </div>
-);
-
-export default SelectorTable;
-
-interface ClassNameProps {
-    values: string[];
-    setSelectedIdentifiers: React.Dispatch<
-        React.SetStateAction<ElementIdentifier>
-    >;
-}
-const ClassNamesRow: React.FC<ClassNameProps> = ({
-    values,
+    selectedIdentifiers,
     setSelectedIdentifiers,
 }) => {
-    const [selectedValues, setSelectedValues] = useState<Set<string>>(
+    const [selectedClassNames, setSelectedClassNames] = useState<Set<string>>(
         new Set()
     );
+    const [selectedAttributes, setSelectedAttributes] = useState<Set<string>>(
+        new Set()
+    );
+    const [selectedSimpleRow, setSelectedSimpleRow] =
+        useState<PrimitiveIdentifierTypes>();
 
-    const handleRowClick = (value: string) => {
+    const handleClassNameSelection = (value: string) => {
+        if (isPicking) return;
         setSelectedIdentifiers((prevIdentifier) => {
+            if (selectedSimpleRow && SPECIAL_SELECTORS.has(selectedSimpleRow)) {
+                setSelectedSimpleRow(undefined);
+                setSelectedIdentifiers((prevIdentifiers) => {
+                    const updatedIdentifiers = { ...prevIdentifiers };
+                    delete updatedIdentifiers[selectedSimpleRow];
+                    return updatedIdentifiers;
+                });
+            }
+
             const updatedClassNames = new Set(prevIdentifier.classNames || []);
 
             if (updatedClassNames.has(value)) {
@@ -91,7 +63,7 @@ const ClassNamesRow: React.FC<ClassNameProps> = ({
             };
         });
 
-        setSelectedValues((prevSelected) => {
+        setSelectedClassNames((prevSelected) => {
             const updated = new Set(prevSelected);
             if (updated.has(value)) {
                 updated.delete(value);
@@ -102,52 +74,19 @@ const ClassNamesRow: React.FC<ClassNameProps> = ({
         });
     };
 
-    const isSelected = (value: string) => selectedValues.has(value);
-
-    return (
-        <>
-            <tr>
-                <td colSpan={2} className="label">
-                    Classes:
-                </td>
-            </tr>
-            {values.map((value, index) => (
-                <tr
-                    key={`class_${index}`}
-                    className={`selection value ${
-                        isSelected(value) ? 'active' : ''
-                    }`}
-                    onClick={() => handleRowClick(value)}
-                >
-                    <td colSpan={2} style={{ paddingLeft: '40%' }}>
-                        {value}
-                    </td>
-                </tr>
-            ))}
-        </>
-    );
-};
-
-interface AttributesProps {
-    value: Record<string, string>;
-    setSelectedIdentifiers: React.Dispatch<
-        React.SetStateAction<ElementIdentifier>
-    >;
-}
-
-const AttributesRow: React.FC<AttributesProps> = ({
-    value,
-    setSelectedIdentifiers,
-}) => {
-    // Track selected attributes locally for visual highlighting
-    const [selectedAttributes, setSelectedAttributes] = useState<Set<string>>(
-        new Set()
-    );
-
-    const handleAttributeClick = (
+    const handleAttributeSelection = (
         attribute: string,
         attributeValue: string
     ) => {
+        if (isPicking) return;
+        if (selectedSimpleRow && SPECIAL_SELECTORS.has(selectedSimpleRow)) {
+            setSelectedSimpleRow(undefined);
+            setSelectedIdentifiers((prevIdentifiers) => {
+                const updatedIdentifiers = { ...prevIdentifiers };
+                delete updatedIdentifiers[selectedSimpleRow];
+                return updatedIdentifiers;
+            });
+        }
         setSelectedIdentifiers((prevIdentifiers) => {
             const updatedAttributes = { ...(prevIdentifiers.attributes || {}) };
 
@@ -171,6 +110,152 @@ const AttributesRow: React.FC<AttributesProps> = ({
         });
     };
 
+    const handleSimpleRowSelection = (
+        label: PrimitiveIdentifierTypes,
+        value: string
+    ) => {
+        if (isPicking) return;
+        if (SPECIAL_SELECTORS.has(label)) {
+            if (label in selectedIdentifiers) {
+                setSelectedSimpleRow(undefined);
+                setSelectedIdentifiers({});
+            } else {
+                setSelectedSimpleRow(label);
+                setSelectedIdentifiers({
+                    [label]: value,
+                });
+            }
+            setSelectedClassNames(new Set());
+            setSelectedAttributes(new Set());
+        } else {
+            setSelectedIdentifiers((prevIdentifiers) => {
+                const updatedIdentifiers = { ...prevIdentifiers };
+
+                if (label in updatedIdentifiers) {
+                    delete updatedIdentifiers[label];
+                    setSelectedSimpleRow(undefined);
+                } else {
+                    SPECIAL_SELECTORS.forEach((specialSelector) => {
+                        delete updatedIdentifiers[specialSelector];
+                    });
+                    updatedIdentifiers[label] = value;
+
+                    setSelectedSimpleRow(label);
+                }
+                return updatedIdentifiers;
+            });
+        }
+    };
+
+    return (
+        <div className="element-selector-container">
+            <table className="element-selector-table">
+                <tbody>
+                    {Object.entries(identifier).map(([key, value]) => {
+                        if (value !== undefined) {
+                            if (Array.isArray(value) && key === 'classNames') {
+                                return (
+                                    <ClassNamesRow
+                                        isPicking={isPicking}
+                                        values={value}
+                                        selectedClassNames={selectedClassNames}
+                                        handleClassNameSelection={
+                                            handleClassNameSelection
+                                        }
+                                    />
+                                );
+                            }
+                            if (
+                                typeof value === 'object' &&
+                                key === 'attributes'
+                            ) {
+                                return (
+                                    <AttributesRow
+                                        isPicking={isPicking}
+                                        value={value}
+                                        selectedAttributes={selectedAttributes}
+                                        handleAttributeSelection={
+                                            handleAttributeSelection
+                                        }
+                                    />
+                                );
+                            }
+                            return (
+                                <SimpleIdentifierRow
+                                    isPicking={isPicking}
+                                    label={key as PrimitiveIdentifierTypes}
+                                    value={value}
+                                    selectedSimpleRow={selectedSimpleRow}
+                                    handleSimpleRowSelection={
+                                        handleSimpleRowSelection
+                                    }
+                                />
+                            );
+                        }
+                        return null;
+                    })}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
+export default SelectorTable;
+
+interface ClassNameProps {
+    isPicking: boolean;
+    values: string[];
+    selectedClassNames: Set<string>;
+    handleClassNameSelection: (value: string) => void;
+}
+const ClassNamesRow: React.FC<ClassNameProps> = ({
+    isPicking,
+    values,
+    handleClassNameSelection,
+    selectedClassNames,
+}) => {
+    const isSelected = (value: string) => selectedClassNames.has(value);
+
+    return (
+        <>
+            <tr>
+                <td colSpan={2} className="label">
+                    Classes:
+                </td>
+            </tr>
+            {values.map((value, index) => (
+                <tr
+                    key={`class_${index}`}
+                    className={`${!isPicking && 'selection'} value ${
+                        isSelected(value) ? 'active' : ''
+                    }`}
+                    onClick={() => handleClassNameSelection(value)}
+                >
+                    <td colSpan={2} style={{ paddingLeft: '40%' }}>
+                        {trimString(value)}
+                    </td>
+                </tr>
+            ))}
+        </>
+    );
+};
+
+interface AttributesProps {
+    isPicking: boolean;
+    value: Record<string, string>;
+    selectedAttributes: Set<string>;
+    handleAttributeSelection: (
+        attribute: string,
+        attributeValue: string
+    ) => void;
+}
+
+const AttributesRow: React.FC<AttributesProps> = ({
+    isPicking,
+    value,
+    selectedAttributes,
+    handleAttributeSelection,
+}) => {
     const isAttributeSelected = (attribute: string) =>
         selectedAttributes.has(attribute);
 
@@ -184,17 +269,17 @@ const AttributesRow: React.FC<AttributesProps> = ({
             {Object.entries(value).map(([attribute, attributeValue]) => (
                 <tr
                     key={`attributes_${attribute}`}
-                    className={`selection ${
+                    className={`${!isPicking && 'selection'} ${
                         isAttributeSelected(attribute) ? 'active' : ''
                     }`}
                     onClick={() =>
-                        handleAttributeClick(attribute, attributeValue)
+                        handleAttributeSelection(attribute, attributeValue)
                     }
                 >
                     <td className="label" style={{ paddingLeft: '10%' }}>
                         {attribute}
                     </td>
-                    <td className="value">{attributeValue}</td>
+                    <td className="value">{trimString(attributeValue)}</td>
                 </tr>
             ))}
         </>
@@ -202,44 +287,36 @@ const AttributesRow: React.FC<AttributesProps> = ({
 };
 
 interface SimpleIdentifierProps {
-    label: keyof Omit<ElementIdentifier, 'attributes' | 'classNames'>;
+    isPicking: boolean;
+    label: PrimitiveIdentifierTypes;
     value: string;
-    setSelectedIdentifiers: React.Dispatch<
-        React.SetStateAction<ElementIdentifier>
+    selectedSimpleRow?: keyof Omit<
+        ElementIdentifier,
+        'attributes' | 'classNames'
     >;
+    handleSimpleRowSelection: (
+        label: PrimitiveIdentifierTypes,
+        value: string
+    ) => void;
 }
 
 const SimpleIdentifierRow: React.FC<SimpleIdentifierProps> = ({
+    isPicking,
     label,
     value,
-    setSelectedIdentifiers,
+    selectedSimpleRow,
+    handleSimpleRowSelection,
 }) => {
-    const [selected, setSelected] = useState(false);
-
-    const handleRowClick = () => {
-        setSelectedIdentifiers((prevIdentifiers) => {
-            const updatedIdentifiers = { ...prevIdentifiers };
-
-            if (label in updatedIdentifiers) {
-                delete updatedIdentifiers[label];
-            } else {
-                updatedIdentifiers[label] = value;
-            }
-
-            return updatedIdentifiers;
-        });
-
-        setSelected((prevSelected) => !prevSelected);
-    };
-
     return (
         <tr
             key={label}
-            className={`selection ${selected ? 'active' : ''}`}
-            onClick={handleRowClick}
+            className={`${!isPicking && 'selection'} ${
+                selectedSimpleRow === label ? 'active' : ''
+            }`}
+            onClick={() => handleSimpleRowSelection(label, value)}
         >
             <td className="label">{label}</td>
-            <td className="value">{value}</td>
+            <td className="value">{trimString(value)}</td>
         </tr>
     );
 };
