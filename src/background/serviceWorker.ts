@@ -35,17 +35,19 @@ const ContentScriptMessageHandler: MessageHandler<ContentScriptMessage> = {
         return false;
     },
     async saveContentScriptData(message: ContentScriptMessage) {
-        const userScript = message.userScript;
-        const userScripts =
-            (await LocalStorageWrapper.get('userScripts')) || [];
-        userScripts.push(userScript);
-        await LocalStorageWrapper.set('userScripts', userScripts);
-        await LocalStorageWrapper.set('isCreating', false);
-        const workerMessage: WorkerMessage = {
-            source: 'Worker',
-            signal: 'REFRESH_POPUP',
-        };
-        chrome.runtime.sendMessage(workerMessage);
+        if (message.signal === 'SAVE') {
+            const userScript = message.userScript;
+            const userScripts =
+                (await LocalStorageWrapper.get('userScripts')) || [];
+            userScripts.push(userScript);
+            await LocalStorageWrapper.set('userScripts', userScripts);
+            await LocalStorageWrapper.set('isCreating', false);
+            const workerMessage: WorkerMessage = {
+                source: 'Worker',
+                signal: 'REFRESH_POPUP',
+            };
+            chrome.runtime.sendMessage(workerMessage);
+        }
     },
 };
 

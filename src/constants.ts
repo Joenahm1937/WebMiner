@@ -5,7 +5,7 @@ export const WorkerSignals = {
 } as const;
 
 export const ContentScriptSignals = {
-    Completed: 'COMPLETED',
+    Save: 'SAVE',
 } as const;
 
 export const PopupSignals = {

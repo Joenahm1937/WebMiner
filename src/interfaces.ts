@@ -40,7 +40,7 @@ export type PopupMessage = BasePopupMessage | PopupSettingsUpdateMessage;
 export type ContentScriptMessage = {
     source: 'ContentScript';
     signal: (typeof ContentScriptSignals)[keyof typeof ContentScriptSignals];
-    userScript: UserScript;
+    userScript: Script;
 };
 
 // Defines response structure for message handlers.
@@ -81,13 +81,24 @@ export interface Settings extends SerializableObject {
     devMode: boolean;
 }
 
-export interface UserScript extends SerializableObject {
-    id: number;
+export interface SelectorResult {
+    searchAPI: 'querySelector' | 'getElementById' | 'getElementsByText';
+    selector: string;
+}
+
+export interface ScriptStep {
+    element?: SelectorResult;
+    command?: string;
+}
+
+export interface Script {
+    name: string;
+    steps: ScriptStep[];
 }
 
 export interface ILocalStorage {
     isCreating: boolean;
-    userScripts: UserScript[];
+    userScripts: Script[];
     devMode: boolean;
 }
 

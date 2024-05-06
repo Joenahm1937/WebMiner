@@ -1,6 +1,7 @@
 import { finder } from '@medv/finder';
 import { TEXT_LIMIT } from '../constants';
-import { ElementIdentifier, SelectorResult } from '../interfaces';
+import { ElementIdentifier } from '../interfaces';
+import { SelectorResult } from '../../interfaces';
 
 export const getElementIdentifiers = (
     element: HTMLElement

@@ -6,7 +6,12 @@ import React, {
     useContext,
     useState,
 } from 'react';
-import { ScriptStep, SelectorResult } from './interfaces';
+import {
+    ContentScriptMessage,
+    Script,
+    ScriptStep,
+    SelectorResult,
+} from '../interfaces';
 
 interface ScriptContextType {
     name: string;
@@ -20,7 +25,7 @@ interface ScriptContextType {
     elementPickingStep?: number;
     setElementPickingStep: Dispatch<SetStateAction<number | undefined>>;
     canExecuteScript: () => boolean;
-    saveScript: () => boolean;
+    saveScript: () => void;
 }
 
 const ScriptContext = createContext<ScriptContextType | undefined>(undefined);
@@ -75,12 +80,18 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
         );
     };
 
-    const saveScript = (): boolean => {
-        console.log({
+    const saveScript = (): void => {
+        const script: Script = {
             name,
             steps,
-        });
-        return true;
+        };
+
+        const response: ContentScriptMessage = {
+            source: 'ContentScript',
+            signal: 'SAVE',
+            userScript: script,
+        };
+        chrome.runtime.sendMessage(response);
     };
 
     const value = {

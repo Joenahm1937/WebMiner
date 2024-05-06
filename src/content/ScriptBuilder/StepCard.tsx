@@ -1,8 +1,8 @@
 import './StepCard.css';
 import { useScriptContext } from '../ScriptContext';
-import { ScriptStep } from '../interfaces';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowPointer, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { ScriptStep } from '../../interfaces';
 
 interface StepProps extends ScriptStep {
     stepNumber: number;

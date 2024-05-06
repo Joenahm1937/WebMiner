@@ -1,10 +1,8 @@
-import type { UserScript } from '../interfaces';
-
-const ScriptCard = ({ id }: UserScript) => {
+const ScriptCard = ({ name }: { name: string }) => {
     return (
         <li className="script-card">
             <div>
-                <div>{id}</div>
+                <div>{name}</div>
             </div>
         </li>
     );

@@ -4,11 +4,6 @@ declare global {
     }
 }
 
-export interface ScriptStep {
-    element?: SelectorResult;
-    command?: string;
-}
-
 export interface ElementIdentifier {
     // ID: The id attribute is intended to be unique within a page and is often used to point directly to a specific element.
     id?: string;
@@ -52,8 +47,3 @@ export type PrimitiveIdentifierTypes = Exclude<
     ElementIdentifierTypes,
     'attributes' | 'classNames'
 >;
-
-export interface SelectorResult {
-    searchAPI: 'querySelector' | 'getElementById' | 'getElementsByText';
-    selector: string;
-}

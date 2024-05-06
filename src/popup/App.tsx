@@ -1,5 +1,5 @@
 import type {
-    UserScript,
+    Script,
     Message,
     PopupMessage,
     PopupSettingsUpdateMessage,
@@ -24,7 +24,7 @@ import { PopupSignals } from '../constants';
 
 const App = () => {
     const [creating, setCreating] = useState(false);
-    const [scripts, setScripts] = useState<UserScript[]>([]);
+    const [scripts, setScripts] = useState<Script[]>([]);
     const [errorMessage, setErrorMessage] = useState<string>();
     const [settingsVisible, setSettingsVisible] = useState<boolean>(false);
     const isFirstMount = useRef(true);
