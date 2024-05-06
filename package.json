@@ -6,7 +6,7 @@
     "scripts": {
         "build:main": "vite build --config vite.config.js",
         "build:content": "vite build --config vite.content.config.js",
-        "watch:content": "npm run build:content && chokidar 'src/content/**/*' -c 'npm run build:content'",
+        "watch:content": "npm run build && chokidar 'src/content/**/*' -c 'npm run build:content'",
         "build": "npm run clean && npm run build:main && npm run build:content",
         "watch": "npm run build && chokidar 'src/**/*' -c 'npm run build'",
         "clean": "rm -rf dist && mkdir dist && mkdir dist/content"
