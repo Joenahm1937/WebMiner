@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { trimString } from './utils';
 import './SelectorTable.css';
 import {
@@ -36,6 +36,13 @@ const SelectorTable: React.FC<SelectorTableProps> = ({
     );
     const [selectedSimpleRow, setSelectedSimpleRow] =
         useState<PrimitiveIdentifierTypes>();
+
+    useEffect(() => {
+        setSelectedIdentifiers({});
+        setSelectedClassNames(new Set());
+        setSelectedAttributes(new Set());
+        setSelectedSimpleRow(undefined);
+    }, [isPicking]);
 
     const handleClassNameSelection = (value: string) => {
         if (isPicking) return;
