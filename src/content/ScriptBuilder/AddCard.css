@@ -7,7 +7,9 @@
     margin-bottom: 16px;
     text-align: center;
     cursor: pointer;
-    transition: box-shadow 0.2s, border-color 0.2s;
+    animation: fadeInSlideDown 0.5s ease-in-out;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
 }
 
 .add-card-container:hover {

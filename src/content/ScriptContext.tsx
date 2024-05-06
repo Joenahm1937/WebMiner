@@ -20,6 +20,7 @@ interface ScriptContextType {
     elementPickingStep?: number;
     setElementPickingStep: Dispatch<SetStateAction<number | undefined>>;
     canExecuteScript: () => boolean;
+    saveScript: () => boolean;
 }
 
 const ScriptContext = createContext<ScriptContextType | undefined>(undefined);
@@ -74,6 +75,14 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
         );
     };
 
+    const saveScript = (): boolean => {
+        console.log({
+            name,
+            steps,
+        });
+        return true;
+    };
+
     const value = {
         name,
         setName,
@@ -86,6 +95,7 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
         elementPickingStep,
         setElementPickingStep,
         canExecuteScript,
+        saveScript,
     };
 
     return (

@@ -1,30 +1,29 @@
-.edit-script-name-container {
+.control-panel-name-container {
     padding-top: 10px;
     border: 2px #c0c0c0;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.edit-script-name-container.centered {
+.control-panel-name-container.centered {
     padding: 10px;
     margin: 0 auto;
 }
 
-.edit-script-name-container.row-view {
+.control-panel-name-container.row-view {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px;
     margin-bottom: 0;
-    cursor: pointer;
 }
 
-.edit-script-name-card {
+.control-panel-name-card {
     display: flex;
     align-items: center;
 }
 
-.edit-script-name-input {
+.control-panel-name-input {
     width: 80%;
     padding: 8px;
     margin: 10px 0;
@@ -32,7 +31,7 @@
     border: 1px solid #ccc;
 }
 
-.edit-script-save-button,
+.control-panel-save-button,
 .save-icon-button,
 .edit-icon-button {
     color: #fff;
@@ -55,6 +54,20 @@
     color: #555;
 }
 
+.success-banner {
+    background-color: #ddffdd;
+    border: 1px solid #ccffcc;
+    border-radius: 8px;
+    color: #4ca64c;
+    padding: 8px;
+    margin-top: 8px;
+    font-weight: bold;
+    text-align: center;
+    animation: fadeInSlideDown 0.5s ease-in-out;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+}
+
 .error-banner {
     background-color: #ffdddd;
     border: 1px solid #ffcccc;
@@ -64,4 +77,7 @@
     margin-top: 8px;
     font-weight: bold;
     text-align: center;
+    animation: fadeInSlideDown 0.5s ease-in-out;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
 }

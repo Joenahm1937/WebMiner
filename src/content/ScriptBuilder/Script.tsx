@@ -2,14 +2,14 @@ import './Script.css';
 import StepCard from './StepCard';
 import AddCard from './AddCard';
 import { useScriptContext } from '../ScriptContext';
-import EditScriptName from './EditScriptName';
+import ControlPanel from './ControlPanel';
 
 const Script: React.FC = () => {
     const { steps, name } = useScriptContext();
 
     return (
         <div className="script-container">
-            <EditScriptName />
+            <ControlPanel />
             {steps.map((step, stepNumber) => (
                 <StepCard
                     key={stepNumber}

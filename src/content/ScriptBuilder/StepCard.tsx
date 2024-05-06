@@ -31,7 +31,11 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
     const isCommandMissing = command === undefined;
 
     return (
-        <div className="step-card-container">
+        <div
+            className={`step-card-container ${
+                isElementMissing && isCommandMissing && 'empty-card'
+            }`}
+        >
             <div className="step-card-header">
                 <button className="step-pick-button" onClick={enterPickingMode}>
                     <FontAwesomeIcon icon={faArrowPointer} className="fa-lg" />

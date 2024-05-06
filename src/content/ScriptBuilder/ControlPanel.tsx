@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useScriptContext } from '../ScriptContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileEdit, faSave, faCheck } from '@fortawesome/free-solid-svg-icons';
-import './EditScriptName.css';
+import './ControlPanel.css';
 
-const EditScriptName: React.FC = () => {
-    const { name, setName } = useScriptContext();
-    const [editMode, setEditMode] = useState<boolean>(!name);
+const ControlPanel: React.FC = () => {
+    const { name, setName, saveScript, canExecuteScript } = useScriptContext();
+    const [editNameMode, setEditNameMode] = useState<boolean>(!name);
     const [tempName, setTempName] = useState<string>(name || '');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const saveName = () => {
         if (!tempName.trim()) {
@@ -18,39 +19,50 @@ const EditScriptName: React.FC = () => {
 
         setErrorMessage(null);
         setName(tempName.trim());
-        setEditMode(false);
+        setEditNameMode(false);
     };
 
     const editName = () => {
-        setEditMode(true);
+        setEditNameMode(true);
         setTempName(name || '');
+    };
+
+    const handleSave = () => {
+        if (canExecuteScript()) {
+            saveScript();
+            setSuccessMessage('Successfully Saved');
+            setTimeout(() => setSuccessMessage(null), 3000);
+        } else {
+            setErrorMessage('Please fill out all steps');
+            setTimeout(() => setErrorMessage(null), 3000);
+        }
     };
 
     return (
         <div
-            className={`edit-script-name-container ${
-                editMode ? 'centered' : 'row-view'
+            className={`control-panel-name-container ${
+                editNameMode ? 'centered' : 'row-view'
             }`}
         >
-            {editMode ? (
-                <div className="edit-script-name-card">
+            {editNameMode ? (
+                <div className="control-panel-name-card">
                     <input
                         type="text"
                         value={tempName}
                         onChange={(e) => setTempName(e.target.value)}
                         placeholder="Enter Script Name"
-                        className="edit-script-name-input"
+                        className="control-panel-name-input"
                     />
                     <button
                         onClick={saveName}
-                        className="edit-script-save-button"
+                        className="control-panel-save-button"
                     >
                         <FontAwesomeIcon icon={faCheck} className="fa-lg" />
                     </button>
                 </div>
             ) : (
                 <>
-                    <div className="edit-script-row">
+                    <div className="control-panel-row">
                         <button onClick={editName} className="edit-icon-button">
                             <FontAwesomeIcon
                                 icon={faFileEdit}
@@ -59,16 +71,22 @@ const EditScriptName: React.FC = () => {
                         </button>
                         <span className="script-name-display">{name}</span>
                     </div>
-                    <div className="edit-script-row">
-                        <button onClick={saveName} className="save-icon-button">
+                    <div className="control-panel-row">
+                        <button
+                            onClick={handleSave}
+                            className="save-icon-button"
+                        >
                             <FontAwesomeIcon icon={faSave} className="fa-lg" />
                         </button>
                     </div>
                 </>
             )}
             {errorMessage && <div className="error-banner">{errorMessage}</div>}
+            {successMessage && (
+                <div className="success-banner">{successMessage}</div>
+            )}
         </div>
     );
 };
 
-export default EditScriptName;
+export default ControlPanel;

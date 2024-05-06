@@ -15,10 +15,24 @@
     color: black;
     width: 400px;
     border-radius: 10px;
+    animation: fadeInSlideDown 0.5s ease-in-out;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
 }
 
 #web-miner-modal button {
     color: black;
     font-size: 16px;
     padding: 5px 10px;
+}
+
+@keyframes fadeInSlideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-20%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
