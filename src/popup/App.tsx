@@ -2,34 +2,29 @@ import type {
     Script,
     Message,
     PopupMessage,
-    PopupSettingsUpdateMessage,
     ResponseMessage,
 } from '../interfaces';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import logo from './assets/logo.svg';
 import settings from './assets/settings.svg';
 import './App.css';
 import {
-    TOGGLE_CREATION_STATE,
+    TOGGLE_EDIT_STATE,
     EXTENSION_HEADER,
     RESET_BUTTON_TEXT,
 } from './constants';
 import { LocalStorageWrapper } from '../LocalStorageWrapper';
 import ScriptCardList from './ScriptList';
 import ErrorComponent from './ErrorComponent';
-import CreatingAnimation from './CreatingAnimation';
+import EditingAnimation from './EditingAnimation';
 import SettingsModal from './SettingsModal';
-import { useAppContext } from './AppContext';
-import { PopupSignals } from '../constants';
+import { PopupSignal } from '../constants';
 
 const App = () => {
-    const [creating, setCreating] = useState(false);
-    const [scripts, setScripts] = useState<Script[]>([]);
+    const [isEditing, setIsEditing] = useState(false);
+    const [scripts, setScripts] = useState<Record<string, Script>>({});
     const [errorMessage, setErrorMessage] = useState<string>();
     const [settingsVisible, setSettingsVisible] = useState<boolean>(false);
-    const isFirstMount = useRef(true);
-
-    const { developerMode, setDeveloperMode } = useAppContext();
 
     useEffect(() => {
         initializeUI();
@@ -46,42 +41,19 @@ const App = () => {
         return () => chrome.runtime.onMessage.removeListener(handleMessage);
     }, []);
 
-    useEffect(() => {
-        if (isFirstMount.current) {
-            isFirstMount.current = false;
-            return;
-        }
-
-        const message: PopupSettingsUpdateMessage = {
-            source: 'Popup',
-            signal: 'UPDATE_SETTINGS',
-            payload: {
-                devMode: developerMode,
-            },
-        };
-
-        const updateSettings = async () => {
-            await LocalStorageWrapper.set('devMode', developerMode);
-            chrome.runtime.sendMessage(message);
-        };
-
-        updateSettings();
-    }, [developerMode]);
-
     const initializeUI = async () => {
-        const storedScripts = await LocalStorageWrapper.get('userScripts');
+        const storedScripts = await LocalStorageWrapper.get('userScripts', {});
         const storedCreatingStatus = await LocalStorageWrapper.get(
-            'isCreating'
+            'editing',
+            false
         );
-        const storedDevMode = await LocalStorageWrapper.get('devMode');
-        if (storedScripts) setScripts(storedScripts);
-        if (storedCreatingStatus) setCreating(storedCreatingStatus);
-        if (storedDevMode) setDeveloperMode(storedDevMode);
+        setScripts(storedScripts);
+        setIsEditing(storedCreatingStatus);
     };
 
     const refreshUI = () => {
-        LocalStorageWrapper.get('userScripts').then((userScripts) => {
-            setScripts(userScripts || []);
+        LocalStorageWrapper.get('userScripts', {}).then((userScripts) => {
+            setScripts(userScripts);
         });
     };
 
@@ -90,32 +62,33 @@ const App = () => {
     };
 
     const toggleScraping = async () => {
-        const creatingStatus = creating
-            ? PopupSignals.Completing
-            : PopupSignals.Creating;
-        const message: PopupMessage = {
-            source: 'Popup',
-            signal: creatingStatus,
-        };
-        const newCreatingStatus = !creating;
-        await LocalStorageWrapper.set('isCreating', !creating);
-        setCreating((prevCreatingState) => !prevCreatingState);
+        let message: PopupMessage;
+        if (isEditing) {
+            message = {
+                source: 'Popup',
+                signal: PopupSignal.CleanSession,
+            };
+        } else {
+            message = {
+                source: 'Popup',
+                signal: PopupSignal.LaunchSession,
+            };
+        }
+
+        const newEditStatus = !isEditing;
+        await LocalStorageWrapper.set('editing', !isEditing);
+        setIsEditing((prevEditState) => !prevEditState);
         chrome.runtime.sendMessage(message, (response: ResponseMessage) => {
             if (!response.success) {
-                LocalStorageWrapper.set('isCreating', !newCreatingStatus);
-                setCreating((prevCreatingState) => !prevCreatingState);
+                LocalStorageWrapper.set('editing', !newEditStatus);
+                setIsEditing((prevEditState) => !prevEditState);
                 setErrorMessage(response.message);
             }
         });
     };
 
     const reset = async () => {
-        LocalStorageWrapper.remove(['isCreating', 'userScripts']);
-        const message: PopupMessage = {
-            source: 'Popup',
-            signal: 'RESTART',
-        };
-        chrome.runtime.sendMessage(message);
+        LocalStorageWrapper.remove(['editing', 'userScripts']);
         refreshUI();
     };
 
@@ -140,12 +113,12 @@ const App = () => {
             <h2>{EXTENSION_HEADER}</h2>
             <div className="buttons">
                 <button onClick={toggleScraping}>
-                    {creating
-                        ? TOGGLE_CREATION_STATE.CREATING
-                        : TOGGLE_CREATION_STATE.REST}
+                    {isEditing
+                        ? TOGGLE_EDIT_STATE.EDITING
+                        : TOGGLE_EDIT_STATE.REST}
                 </button>
-                {creating ? <CreatingAnimation /> : null}
-                {!creating && scripts.length ? (
+                {isEditing ? <EditingAnimation /> : null}
+                {!isEditing && scripts.length ? (
                     <button onClick={reset}>{RESET_BUTTON_TEXT}</button>
                 ) : null}
             </div>

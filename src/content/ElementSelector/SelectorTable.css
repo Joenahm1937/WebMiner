@@ -20,12 +20,12 @@
     background-color: #d1e7ff; /* Light blue for active state */
 }
 
-.label {
+.identifier-label {
     font-weight: bold;
     color: #333; /* Darker color for better contrast */
 }
 
-.value {
+.identifier-value {
     word-break: break-word; /* Allows breaking long words gracefully */
     font-style: italic;
     color: #555; /* Different color to distinguish value from label */

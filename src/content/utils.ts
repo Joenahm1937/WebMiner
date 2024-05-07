@@ -1,18 +1,8 @@
 import ReactDOM from 'react-dom';
-import { UserScript, ContentScriptMessage } from '../interfaces';
 import { MODAL_ID } from './constants';
 
 export const tearDownModal = () => {
     if (window.myModalElement) {
-        const scriptNodes: UserScript = {
-            id: Math.random(),
-        };
-        const response: ContentScriptMessage = {
-            source: 'ContentScript',
-            signal: 'COMPLETED',
-            userScript: scriptNodes,
-        };
-        chrome.runtime.sendMessage(response);
         ReactDOM.unmountComponentAtNode(window.myModalElement);
         window.myModalElement.remove();
         window.myModalElement = undefined;

@@ -14,14 +14,13 @@ const PopupMessageHandler: MessageHandler<PopupMessage> = {
         const handleControllerError = (error: Error) => {
             if (error) sendResponse({ success: false, message: error.message });
         };
-        if (message.signal === 'UPDATE_SETTINGS') {
-            PageScriptCoordinator.updateSettings({
-                enableStackTrace: message.payload.devMode,
-            });
-        } else if (message.signal === 'CREATE') {
-            PageScriptCoordinator.startProcessing(handleControllerError);
+        if (message.signal === 'LAUNCH_SESSION') {
+            PageScriptCoordinator.startProcessing(
+                message.scriptName,
+                handleControllerError
+            );
             return true;
-        } else if (message.signal === 'COMPLETE') {
+        } else if (message.signal === 'CLEAN_SESSION') {
             PageScriptCoordinator.stopProcessing(handleControllerError);
             sendResponse({ success: true });
         }
@@ -35,13 +34,12 @@ const ContentScriptMessageHandler: MessageHandler<ContentScriptMessage> = {
         return false;
     },
     async saveContentScriptData(message: ContentScriptMessage) {
-        if (message.signal === 'SAVE') {
-            const userScript = message.userScript;
-            const userScripts =
-                (await LocalStorageWrapper.get('userScripts')) || [];
-            userScripts.push(userScript);
-            await LocalStorageWrapper.set('userScripts', userScripts);
-            await LocalStorageWrapper.set('isCreating', false);
+        if (message.signal === 'SAVE_SCRIPT') {
+            const scripts = await LocalStorageWrapper.get('userScripts', {});
+            await LocalStorageWrapper.set('userScripts', {
+                ...scripts,
+                [message.script.name]: message.script,
+            });
             const workerMessage: WorkerMessage = {
                 source: 'Worker',
                 signal: 'REFRESH_POPUP',

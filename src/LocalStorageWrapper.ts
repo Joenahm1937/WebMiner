@@ -9,10 +9,11 @@ export const LocalStorageWrapper = {
     },
 
     async get<T extends LocalStorageKeys>(
-        key: T
-    ): Promise<ILocalStorage[T] | undefined> {
+        key: T,
+        defaultValue: ILocalStorage[T]
+    ): Promise<ILocalStorage[T]> {
         const result = await chrome.storage.local.get(key);
-        return result[key];
+        return result[key] !== undefined ? result[key] : defaultValue;
     },
 
     async remove(keys: LocalStorageKeys | LocalStorageKeys[]): Promise<void> {

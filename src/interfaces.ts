@@ -1,4 +1,8 @@
-import { WorkerSignals, ContentScriptSignals, PopupSignals } from './constants';
+import { WorkerSignal, ContentScriptSignal, PopupSignal } from './constants';
+
+type WorkerSignals = keyof typeof WorkerSignal;
+type PopupSignals = keyof typeof PopupSignal;
+type ContentScriptSignals = keyof typeof ContentScriptSignal;
 
 /**
  * Types for Messaging between the background script, the popup UI, and the content scripts.
@@ -7,41 +11,57 @@ import { WorkerSignals, ContentScriptSignals, PopupSignals } from './constants';
 export type Message = WorkerMessage | PopupMessage | ContentScriptMessage;
 
 // Worker-originated messages
-type BaseWorkerMessage = {
+interface BaseWorkerMessage {
     source: 'Worker';
-    signal: Exclude<
-        (typeof WorkerSignals)[keyof typeof WorkerSignals],
-        'START_PAGE_SCRIPT'
-    >;
-};
-export type WorkerScriptContextMessage = {
-    source: 'Worker';
-    signal: 'START_PAGE_SCRIPT';
-    settings: Settings;
-};
-export type WorkerMessage = BaseWorkerMessage | WorkerScriptContextMessage;
+    signal: (typeof WorkerSignal)[WorkerSignals];
+}
+
+interface RefreshPopupMessage extends BaseWorkerMessage {
+    signal: 'REFRESH_POPUP';
+}
+interface CreateModalMessage extends BaseWorkerMessage {
+    signal: 'CREATE_MODAL';
+    script?: Script;
+}
+interface RemoveModalMessage extends BaseWorkerMessage {
+    signal: 'REMOVE_MODAL';
+}
+interface CheckModalMessage extends BaseWorkerMessage {
+    signal: 'CHECK_MODAL_STATUS';
+}
+
+export type WorkerMessage =
+    | RefreshPopupMessage
+    | CreateModalMessage
+    | RemoveModalMessage
+    | CheckModalMessage;
 
 // Popup-originated messages
-type BasePopupMessage = {
+interface BasePopupMessage {
     source: 'Popup';
-    signal: Exclude<
-        (typeof PopupSignals)[keyof typeof PopupSignals],
-        'UPDATE_SETTINGS'
-    >;
-};
-export type PopupSettingsUpdateMessage = {
-    source: 'Popup';
-    signal: 'UPDATE_SETTINGS';
-    payload: Settings;
-};
-export type PopupMessage = BasePopupMessage | PopupSettingsUpdateMessage;
+    signal: (typeof PopupSignal)[PopupSignals];
+}
+interface LaunchSessionMessage extends BasePopupMessage {
+    signal: 'LAUNCH_SESSION';
+    scriptName?: string;
+}
+interface CleanSessionMessage extends BasePopupMessage {
+    signal: 'CLEAN_SESSION';
+}
+
+export type PopupMessage = LaunchSessionMessage | CleanSessionMessage;
 
 // Content script-originated messages
-export type ContentScriptMessage = {
+interface BaseContentScriptMessage {
     source: 'ContentScript';
-    signal: (typeof ContentScriptSignals)[keyof typeof ContentScriptSignals];
-    userScript: Script;
-};
+    signal: (typeof ContentScriptSignal)[ContentScriptSignals];
+}
+interface SaveScriptMessage extends BaseContentScriptMessage {
+    signal: 'SAVE_SCRIPT';
+    script: Script;
+}
+
+export type ContentScriptMessage = SaveScriptMessage;
 
 // Defines response structure for message handlers.
 export type ResponseMessage = {
@@ -97,8 +117,8 @@ export interface Script {
 }
 
 export interface ILocalStorage {
-    isCreating: boolean;
-    userScripts: Script[];
+    editing: boolean;
+    userScripts: Record<string, Script>;
     devMode: boolean;
 }
 

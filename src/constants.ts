@@ -1,16 +1,15 @@
-export const WorkerSignals = {
+export const WorkerSignal = {
     RefreshPopup: 'REFRESH_POPUP',
-    StartPageScript: 'START_PAGE_SCRIPT',
-    StopPageScript: 'STOP_PAGE_SCRIPT',
+    CreateModal: 'CREATE_MODAL',
+    RemoveModal: 'REMOVE_MODAL',
+    CheckModalStatus: 'CHECK_MODAL_STATUS',
 } as const;
 
-export const ContentScriptSignals = {
-    Save: 'SAVE',
+export const PopupSignal = {
+    LaunchSession: 'LAUNCH_SESSION',
+    CleanSession: 'CLEAN_SESSION',
 } as const;
 
-export const PopupSignals = {
-    Creating: 'CREATE',
-    Completing: 'COMPLETE',
-    Restart: 'RESTART',
-    UpdateSettings: 'UPDATE_SETTINGS',
+export const ContentScriptSignal = {
+    SaveScript: 'SAVE_SCRIPT',
 } as const;

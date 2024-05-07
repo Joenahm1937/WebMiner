@@ -1,8 +1,5 @@
-import type {
-    Settings,
-    WorkerMessage,
-    WorkerScriptContextMessage,
-} from '../interfaces';
+import { LocalStorageWrapper } from '../LocalStorageWrapper';
+import type { Settings, WorkerMessage } from '../interfaces';
 import { NO_TAB_PERMISSION_ERROR } from './constants';
 import { IValidatedTab } from './interfaces';
 
@@ -27,7 +24,7 @@ class PageScriptCoordinatorClass {
         };
     }
 
-    public startProcessing = (callback: Function) => {
+    public startProcessing = (name: string | undefined, callback: Function) => {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             const currentTab = tabs[0];
             try {
@@ -37,13 +34,15 @@ class PageScriptCoordinatorClass {
                             target: { tabId: currentTab.id },
                             files: ['content/contentScript.js'],
                         },
-                        () => {
-                            const message: WorkerScriptContextMessage = {
+                        async () => {
+                            const scripts = await LocalStorageWrapper.get(
+                                'userScripts',
+                                {}
+                            );
+                            const message: WorkerMessage = {
                                 source: 'Worker',
-                                signal: 'START_PAGE_SCRIPT',
-                                settings: {
-                                    ...this.settings,
-                                },
+                                signal: 'CREATE_MODAL',
+                                script: name ? scripts[name] : undefined,
                             };
                             chrome.tabs.sendMessage(currentTab.id, message);
                         }
@@ -62,7 +61,7 @@ class PageScriptCoordinatorClass {
                 if (this.isValidTab(currentTab)) {
                     const message: WorkerMessage = {
                         source: 'Worker',
-                        signal: 'STOP_PAGE_SCRIPT',
+                        signal: 'REMOVE_MODAL',
                     };
                     chrome.tabs.sendMessage(currentTab.id, message);
                 }

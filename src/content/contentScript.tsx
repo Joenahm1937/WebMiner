@@ -7,7 +7,7 @@ import { ScriptProvider } from './ScriptContext';
 const handleMessage = async (message: Message) => {
     if (message.source === 'Worker') {
         switch (message.signal) {
-            case 'START_PAGE_SCRIPT':
+            case 'CREATE_MODAL':
                 if (!window.myModalElement) {
                     window.myModalElement = document.createElement('div');
                     document.body.appendChild(window.myModalElement);
@@ -19,7 +19,7 @@ const handleMessage = async (message: Message) => {
                     );
                 }
                 break;
-            case 'STOP_PAGE_SCRIPT':
+            case 'REMOVE_MODAL':
                 tearDownModal();
                 break;
         }

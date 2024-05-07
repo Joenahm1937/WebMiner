@@ -226,7 +226,7 @@ const ClassNamesRow: React.FC<ClassNameProps> = ({
     return (
         <>
             <tr>
-                <td colSpan={2} className="label">
+                <td colSpan={2} className="identifier-label">
                     Classes:
                 </td>
             </tr>
@@ -269,7 +269,7 @@ const AttributesRow: React.FC<AttributesProps> = ({
     return (
         <>
             <tr>
-                <td colSpan={2} className="label">
+                <td colSpan={2} className="identifier-label">
                     Attributes:
                 </td>
             </tr>
@@ -283,8 +283,12 @@ const AttributesRow: React.FC<AttributesProps> = ({
                         handleAttributeSelection(attribute, attributeValue)
                     }
                 >
-                    <td className="label attribute-name">{attribute}</td>
-                    <td className="value">{trimString(attributeValue)}</td>
+                    <td className="identifier-label attribute-name">
+                        {attribute}
+                    </td>
+                    <td className="identifier-value">
+                        {trimString(attributeValue)}
+                    </td>
                 </tr>
             ))}
         </>
@@ -320,8 +324,8 @@ const SimpleIdentifierRow: React.FC<SimpleIdentifierProps> = ({
             }`}
             onClick={() => handleSimpleRowSelection(label, value)}
         >
-            <td className="label">{label}</td>
-            <td className="value">{trimString(value)}</td>
+            <td className="identifier-label">{label}</td>
+            <td className="identifier-value">{trimString(value)}</td>
         </tr>
     );
 };

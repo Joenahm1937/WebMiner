@@ -88,8 +88,8 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
 
         const response: ContentScriptMessage = {
             source: 'ContentScript',
-            signal: 'SAVE',
-            userScript: script,
+            signal: 'SAVE_SCRIPT',
+            script,
         };
         chrome.runtime.sendMessage(response);
     };
