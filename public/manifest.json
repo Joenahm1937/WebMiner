@@ -11,5 +11,11 @@
     "background": {
         "service_worker": "serviceWorker.js",
         "type": "module"
-    }
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["signalStatus.js"]
+        }
+    ]
 }

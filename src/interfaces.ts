@@ -1,14 +1,24 @@
-import { WorkerSignal, ContentScriptSignal, PopupSignal } from './constants';
+import {
+    WorkerSignal,
+    ContentScriptSignal,
+    PopupSignal,
+    SignalScriptSignal,
+} from './constants';
 
 type WorkerSignals = keyof typeof WorkerSignal;
 type PopupSignals = keyof typeof PopupSignal;
 type ContentScriptSignals = keyof typeof ContentScriptSignal;
+type SignalScriptSignals = keyof typeof SignalScriptSignal;
 
 /**
  * Types for Messaging between the background script, the popup UI, and the content scripts.
  */
 
-export type Message = WorkerMessage | PopupMessage | ContentScriptMessage;
+export type Message =
+    | WorkerMessage
+    | PopupMessage
+    | ContentScriptMessage
+    | SignalScriptMessage;
 
 // Worker-originated messages
 interface BaseWorkerMessage {
@@ -62,6 +72,17 @@ interface SaveScriptMessage extends BaseContentScriptMessage {
 }
 
 export type ContentScriptMessage = SaveScriptMessage;
+
+interface BaseSignalScriptMessage {
+    source: 'SignalScript';
+    signal: (typeof SignalScriptSignal)[SignalScriptSignals];
+}
+interface ModalStatusMessage extends BaseSignalScriptMessage {
+    signal: 'MODAL_STATUS';
+    isOpen: boolean;
+}
+
+export type SignalScriptMessage = ModalStatusMessage;
 
 // Defines response structure for message handlers.
 export type ResponseMessage = {

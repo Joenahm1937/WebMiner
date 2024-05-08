@@ -8,11 +8,7 @@ import { useEffect, useState } from 'react';
 import logo from './assets/logo.svg';
 import settings from './assets/settings.svg';
 import './App.css';
-import {
-    TOGGLE_EDIT_STATE,
-    EXTENSION_HEADER,
-    RESET_BUTTON_TEXT,
-} from './constants';
+import { EXTENSION_HEADER, RESET_BUTTON_TEXT, ModalState } from './constants';
 import { LocalStorageWrapper } from '../LocalStorageWrapper';
 import ScriptCardList from './ScriptList';
 import ErrorComponent from './ErrorComponent';
@@ -21,7 +17,7 @@ import SettingsModal from './SettingsModal';
 import { PopupSignal } from '../constants';
 
 const App = () => {
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState<ModalState>('LOCATING_MODAL');
     const [scripts, setScripts] = useState<Record<string, Script>>({});
     const [errorMessage, setErrorMessage] = useState<string>();
     const [settingsVisible, setSettingsVisible] = useState<boolean>(false);
@@ -43,12 +39,12 @@ const App = () => {
 
     const initializeUI = async () => {
         const storedScripts = await LocalStorageWrapper.get('userScripts', {});
-        const storedCreatingStatus = await LocalStorageWrapper.get(
+        const storedEditingStatus = await LocalStorageWrapper.get(
             'editing',
             false
         );
         setScripts(storedScripts);
-        setIsEditing(storedCreatingStatus);
+        setIsEditing(storedEditingStatus ? 'OPEN_MODAL' : 'NO_MODAL');
     };
 
     const refreshUI = () => {
@@ -61,34 +57,40 @@ const App = () => {
         setSettingsVisible((prevState) => !prevState);
     };
 
-    const toggleScraping = async () => {
-        let message: PopupMessage;
-        if (isEditing) {
-            message = {
-                source: 'Popup',
-                signal: PopupSignal.CleanSession,
-            };
-        } else {
-            message = {
-                source: 'Popup',
-                signal: PopupSignal.LaunchSession,
-            };
-        }
-
-        const newEditStatus = !isEditing;
-        await LocalStorageWrapper.set('editing', !isEditing);
-        setIsEditing((prevEditState) => !prevEditState);
+    const openModal = async () => {
+        const message: PopupMessage = {
+            source: 'Popup',
+            signal: PopupSignal.LaunchSession,
+        };
+        LocalStorageWrapper.set('editing', true);
+        setIsEditing('OPEN_MODAL');
         chrome.runtime.sendMessage(message, (response: ResponseMessage) => {
             if (!response.success) {
-                LocalStorageWrapper.set('editing', !newEditStatus);
-                setIsEditing((prevEditState) => !prevEditState);
+                LocalStorageWrapper.set('editing', false);
+                setIsEditing('NO_MODAL');
                 setErrorMessage(response.message);
             }
         });
     };
 
-    const reset = async () => {
-        LocalStorageWrapper.remove(['editing', 'userScripts']);
+    const closeModal = async () => {
+        const message: PopupMessage = {
+            source: 'Popup',
+            signal: PopupSignal.CleanSession,
+        };
+        LocalStorageWrapper.set('editing', false);
+        setIsEditing('NO_MODAL');
+        chrome.runtime.sendMessage(message, (response: ResponseMessage) => {
+            if (!response.success) {
+                LocalStorageWrapper.set('editing', true);
+                setIsEditing('OPEN_MODAL');
+                setErrorMessage(response.message);
+            }
+        });
+    };
+
+    const deleteScripts = async () => {
+        LocalStorageWrapper.remove('userScripts');
         refreshUI();
     };
 
@@ -111,20 +113,22 @@ const App = () => {
             )}
             <img src={logo} className="logo" alt="logo" />
             <h2>{EXTENSION_HEADER}</h2>
-            <div className="buttons">
-                <button onClick={toggleScraping}>
-                    {isEditing
-                        ? TOGGLE_EDIT_STATE.EDITING
-                        : TOGGLE_EDIT_STATE.REST}
-                </button>
-                {isEditing ? <EditingAnimation /> : null}
-                {!isEditing && scripts.length ? (
-                    <button onClick={reset}>{RESET_BUTTON_TEXT}</button>
+            <div className="popup-buttons">
+                {isEditing === 'NO_MODAL' ? (
+                    <button onClick={openModal}>CREATE NEW</button>
                 ) : null}
+                {isEditing === 'NO_MODAL' && Object.values(scripts).length ? (
+                    <button onClick={deleteScripts}>{RESET_BUTTON_TEXT}</button>
+                ) : null}
+                {isEditing === 'NO_MODAL' && (
+                    <ScriptCardList scripts={scripts} />
+                )}
+                {isEditing === 'OPEN_MODAL' ? (
+                    <button onClick={closeModal}>CLOSE EDITOR</button>
+                ) : null}
+                {isEditing === 'OPEN_MODAL' ? <EditingAnimation /> : null}
             </div>
-
             <ErrorComponent message={errorMessage} />
-            <ScriptCardList scripts={scripts} />
         </>
     );
 };

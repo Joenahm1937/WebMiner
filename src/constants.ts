@@ -13,3 +13,7 @@ export const PopupSignal = {
 export const ContentScriptSignal = {
     SaveScript: 'SAVE_SCRIPT',
 } as const;
+
+export const SignalScriptSignal = {
+    ModalStatus: 'MODAL_STATUS',
+} as const;

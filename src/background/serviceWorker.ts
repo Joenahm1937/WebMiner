@@ -40,11 +40,6 @@ const ContentScriptMessageHandler: MessageHandler<ContentScriptMessage> = {
                 ...scripts,
                 [message.script.name]: message.script,
             });
-            const workerMessage: WorkerMessage = {
-                source: 'Worker',
-                signal: 'REFRESH_POPUP',
-            };
-            chrome.runtime.sendMessage(workerMessage);
         }
     },
 };
@@ -68,6 +63,8 @@ const messageRouter = (
             sendResponse
         );
         if (asyncResponse) return true;
+    } else if (message.source === 'SignalScript') {
+        LocalStorageWrapper.set('editing', message.isOpen);
     } else {
         sendResponse({
             success: false,
@@ -77,3 +74,34 @@ const messageRouter = (
 };
 
 chrome.runtime.onMessage.addListener(messageRouter);
+
+const handleTabChange = (activeInfo: chrome.tabs.TabActiveInfo) => {
+    const tabId = activeInfo.tabId;
+
+    chrome.tabs.get(tabId, (tab) => {
+        // Disabling extension when not on a valid URL ("http://*/*" or "https://*/*")
+        // Our signalStatus content script is not injected on invalid URLs
+        if (!tab || !tab.url) {
+            chrome.action.setBadgeBackgroundColor({
+                color: [255, 255, 255, 255],
+            });
+            chrome.action.disable(tabId);
+            return;
+        }
+    });
+
+    // Check Modal Status on Tab when opened
+    const message: WorkerMessage = {
+        source: 'Worker',
+        signal: 'CHECK_MODAL_STATUS',
+    };
+    chrome.tabs.sendMessage(tabId, message, () => {
+        var lastError = chrome.runtime.lastError;
+        if (lastError) {
+            // Stifling Error if tab is not responsive (indicating modal cannot be open)
+            return;
+        }
+    });
+};
+
+chrome.tabs.onActivated.addListener(handleTabChange);

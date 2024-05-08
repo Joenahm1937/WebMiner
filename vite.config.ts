@@ -37,6 +37,7 @@ export default defineConfig({
             input: {
                 serviceWorker: 'src/background/serviceWorker.ts',
                 popup: 'src/popup/index.html',
+                signalStatus: 'src/signalStatus.ts',
             },
             output: {
                 entryFileNames: `[name].js`,
