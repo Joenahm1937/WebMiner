@@ -29,18 +29,42 @@ const PopupMessageHandler: MessageHandler<PopupMessage> = {
 };
 
 const ContentScriptMessageHandler: MessageHandler<ContentScriptMessage> = {
-    processMessage(message) {
-        this.saveContentScriptData(message);
-        return false;
+    processMessage(message, _, sendResponse) {
+        this.saveContentScriptData(message, sendResponse);
+        return true;
     },
-    async saveContentScriptData(message: ContentScriptMessage) {
-        if (message.signal === 'SAVE_SCRIPT') {
-            const scripts = await LocalStorageWrapper.get('userScripts', {});
-            await LocalStorageWrapper.set('userScripts', {
-                ...scripts,
-                [message.script.name]: message.script,
+    async saveContentScriptData(
+        message: ContentScriptMessage,
+        sendResponse: (response: ResponseMessage) => void
+    ) {
+        if (message.signal !== 'SAVE_SCRIPT') return;
+        const scripts = await LocalStorageWrapper.get('userScripts', {});
+
+        if (
+            (message.originalName === undefined ||
+                message.originalName !== message.script.name) &&
+            message.script.name in scripts
+        ) {
+            sendResponse({
+                success: false,
+                message:
+                    'Script name already exists. Please choose a different name.',
             });
+            return;
         }
+
+        scripts[message.script.name] = message.script;
+
+        // If the name changed, remove the old entry
+        if (
+            message.originalName &&
+            message.originalName !== message.script.name
+        ) {
+            delete scripts[message.originalName];
+        }
+
+        await LocalStorageWrapper.set('userScripts', scripts);
+        sendResponse({ success: true, message: 'Script saved successfully.' });
     },
 };
 
@@ -81,7 +105,7 @@ const handleTabChange = (activeInfo: chrome.tabs.TabActiveInfo) => {
     chrome.tabs.get(tabId, (tab) => {
         // Disabling extension when not on a valid URL ("http://*/*" or "https://*/*")
         // Our signalStatus content script is not injected on invalid URLs
-        if (!tab || !tab.url) {
+        if (!tab || !tab.url || !tab.url.startsWith('http')) {
             chrome.action.setBadgeBackgroundColor({
                 color: [255, 255, 255, 255],
             });

@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import {
     ContentScriptMessage,
+    ResponseMessage,
     Script,
     ScriptStep,
     SelectorResult,
@@ -25,20 +26,27 @@ interface ScriptContextType {
     elementPickingStep?: number;
     setElementPickingStep: Dispatch<SetStateAction<number | undefined>>;
     canExecuteScript: () => boolean;
-    saveScript: () => void;
+    saveScript: () => Promise<string>;
 }
 
 const ScriptContext = createContext<ScriptContextType | undefined>(undefined);
 
 interface ScriptProviderProps {
+    initialScript?: Script;
     children: ReactNode;
 }
 
 // TODO: Begin Updating Local Storage with Added, Updated, and Remove Steps
-export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
-    const [name, setName] = useState<string>('');
+export const ScriptProvider: React.FC<ScriptProviderProps> = ({
+    children,
+    initialScript,
+}) => {
+    const initialName = initialScript?.name;
+    if (initialName) window.myModalOriginalName = initialName;
+    const initialSteps = initialScript?.steps;
+    const [name, setName] = useState<string>(initialName || '');
     // Placeholder Values (Loaded from Local Storage)
-    const [steps, setSteps] = useState<ScriptStep[]>([]);
+    const [steps, setSteps] = useState<ScriptStep[]>(initialSteps || []);
     const [elementPickingStep, setElementPickingStep] = useState<
         number | undefined
     >();
@@ -80,7 +88,7 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
         );
     };
 
-    const saveScript = (): void => {
+    const saveScript = async (): Promise<string> => {
         const script: Script = {
             name,
             steps,
@@ -90,8 +98,18 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({ children }) => {
             source: 'ContentScript',
             signal: 'SAVE_SCRIPT',
             script,
+            originalName: window.myModalOriginalName,
         };
-        chrome.runtime.sendMessage(message);
+        return new Promise((resolve, reject) =>
+            chrome.runtime.sendMessage(message, (response: ResponseMessage) => {
+                if (response.success) {
+                    resolve('Successfully Saved');
+                    window.myModalOriginalName = script.name;
+                } else {
+                    reject(response.message || 'Internal Error');
+                }
+            })
+        );
     };
 
     const value = {

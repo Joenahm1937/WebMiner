@@ -37,14 +37,17 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
             }`}
         >
             <div className="step-card-header">
-                <button className="step-pick-button" onClick={enterPickingMode}>
-                    <FontAwesomeIcon icon={faArrowPointer} className="fa-lg" />
+                <button
+                    className="step-pick-button web-miner-icon"
+                    onClick={enterPickingMode}
+                >
+                    <FontAwesomeIcon icon={faArrowPointer} className="fa-lg " />
                 </button>
                 <button
-                    className="step-delete-button"
+                    className="step-delete-button web-miner-icon"
                     onClick={handleDeleteClick}
                 >
-                    <FontAwesomeIcon icon={faTrash} className="fa-lg" />
+                    <FontAwesomeIcon icon={faTrash} className="fa-lg " />
                 </button>
             </div>
             <div className="step-details">

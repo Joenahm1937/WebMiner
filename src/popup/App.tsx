@@ -57,10 +57,11 @@ const App = () => {
         setSettingsVisible((prevState) => !prevState);
     };
 
-    const openModal = async () => {
+    const openModal = async (name?: string) => {
         const message: PopupMessage = {
             source: 'Popup',
             signal: PopupSignal.LaunchSession,
+            scriptName: name,
         };
         LocalStorageWrapper.set('editing', true);
         setIsEditing('OPEN_MODAL');
@@ -115,13 +116,19 @@ const App = () => {
             <h2>{EXTENSION_HEADER}</h2>
             <div className="popup-buttons">
                 {isEditing === 'NO_MODAL' ? (
-                    <button onClick={openModal}>CREATE NEW</button>
+                    <button
+                        onClick={() => {
+                            openModal();
+                        }}
+                    >
+                        CREATE NEW
+                    </button>
                 ) : null}
                 {isEditing === 'NO_MODAL' && Object.values(scripts).length ? (
                     <button onClick={deleteScripts}>{RESET_BUTTON_TEXT}</button>
                 ) : null}
                 {isEditing === 'NO_MODAL' && (
-                    <ScriptCardList scripts={scripts} />
+                    <ScriptCardList scripts={scripts} openModal={openModal} />
                 )}
                 {isEditing === 'OPEN_MODAL' ? (
                     <button onClick={closeModal}>CLOSE EDITOR</button>

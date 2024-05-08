@@ -92,20 +92,20 @@ const ElementPicker = () => {
             <div className="overlay-controls">
                 {!isPicking && (
                     <button
-                        className="retry-button"
+                        className="retry-button web-miner-icon"
                         onClick={enterPickingState}
                     >
-                        <FontAwesomeIcon icon={faSyncAlt} className="fa-lg" />
+                        <FontAwesomeIcon icon={faSyncAlt} className="fa-lg " />
                     </button>
                 )}
                 {!isPicking && selector.selector.length ? (
                     <button
-                        className="confirm-button"
+                        className="confirm-button web-miner-icon"
                         onClick={confirmPickedElement}
                     >
                         <FontAwesomeIcon
                             icon={faCheckCircle}
-                            className="fa-lg"
+                            className="fa-lg "
                         />
                     </button>
                 ) : null}

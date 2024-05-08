@@ -69,6 +69,7 @@ interface BaseContentScriptMessage {
 interface SaveScriptMessage extends BaseContentScriptMessage {
     signal: 'SAVE_SCRIPT';
     script: Script;
+    originalName?: string;
 }
 
 export type ContentScriptMessage = SaveScriptMessage;

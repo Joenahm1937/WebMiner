@@ -26,6 +26,16 @@
     padding: 5px 10px;
 }
 
+#web-miner-modal input {
+    background-color: #fafafa;
+    color: black;
+}
+
+#web-miner-modal .web-miner-icon {
+    margin: 3px;
+    background-color: #fafafa;
+}
+
 @keyframes fadeInSlideDown {
     0% {
         opacity: 0;

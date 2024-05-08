@@ -6,6 +6,7 @@ export const tearDownModal = () => {
         ReactDOM.unmountComponentAtNode(window.myModalElement);
         window.myModalElement.remove();
         window.myModalElement = undefined;
+        window.myModalOriginalName = undefined;
     }
 };
 

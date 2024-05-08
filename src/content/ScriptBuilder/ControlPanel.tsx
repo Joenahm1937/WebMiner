@@ -27,11 +27,16 @@ const ControlPanel: React.FC = () => {
         setTempName(name || '');
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (canExecuteScript()) {
-            saveScript();
-            setSuccessMessage('Successfully Saved');
-            setTimeout(() => setSuccessMessage(null), 3000);
+            try {
+                const successMessage = await saveScript();
+                setSuccessMessage(successMessage);
+                setTimeout(() => setSuccessMessage(null), 3000);
+            } catch (err) {
+                setErrorMessage(err as string);
+                setTimeout(() => setErrorMessage(null), 3000);
+            }
         } else {
             setErrorMessage('Please fill out all steps');
             setTimeout(() => setErrorMessage(null), 3000);
@@ -55,18 +60,21 @@ const ControlPanel: React.FC = () => {
                     />
                     <button
                         onClick={saveName}
-                        className="control-panel-save-button"
+                        className="control-panel-save-button web-miner-icon"
                     >
-                        <FontAwesomeIcon icon={faCheck} className="fa-lg" />
+                        <FontAwesomeIcon icon={faCheck} className="fa-lg " />
                     </button>
                 </div>
             ) : (
                 <>
                     <div className="control-panel-row">
-                        <button onClick={editName} className="edit-icon-button">
+                        <button
+                            onClick={editName}
+                            className="edit-icon-button web-miner-icon"
+                        >
                             <FontAwesomeIcon
                                 icon={faFileEdit}
-                                className="fa-lg"
+                                className="fa-lg "
                             />
                         </button>
                         <span className="script-name-display">{name}</span>
@@ -74,9 +82,9 @@ const ControlPanel: React.FC = () => {
                     <div className="control-panel-row">
                         <button
                             onClick={handleSave}
-                            className="save-icon-button"
+                            className="save-icon-button web-miner-icon"
                         >
-                            <FontAwesomeIcon icon={faSave} className="fa-lg" />
+                            <FontAwesomeIcon icon={faSave} className="fa-lg " />
                         </button>
                     </div>
                 </>
