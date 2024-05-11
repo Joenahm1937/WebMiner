@@ -92,20 +92,6 @@ export type ResponseMessage = {
 };
 
 /**
- * Interface for message handling across different components.
- * https://developer.chrome.com/docs/extensions/develop/concepts/messaging#simple
- * To use sendResponse() asynchronously, return true in the onMessage event handler.
- */
-export interface MessageHandler<TMessage extends Message> {
-    processMessage: (
-        message: TMessage,
-        sender: chrome.runtime.MessageSender,
-        sendResponse: (response: ResponseMessage) => void
-    ) => boolean;
-    [key: string]: Function;
-}
-
-/**
  * Types for Local Storage Interaction
  */
 
@@ -139,9 +125,8 @@ export interface Script {
 }
 
 export interface ILocalStorage {
-    editing: boolean;
+    isModalOpen: boolean;
     userScripts: Record<string, Script>;
-    devMode: boolean;
 }
 
 export type LocalStorageKeys = keyof ILocalStorage;

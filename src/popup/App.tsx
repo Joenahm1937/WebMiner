@@ -14,7 +14,6 @@ import ScriptCardList from './ScriptList';
 import ErrorComponent from './ErrorComponent';
 import EditingAnimation from './EditingAnimation';
 import SettingsModal from './SettingsModal';
-import { PopupSignal } from '../constants';
 
 const App = () => {
     const [isEditing, setIsEditing] = useState<ModalState>('LOCATING_MODAL');
@@ -40,7 +39,7 @@ const App = () => {
     const initializeUI = async () => {
         const storedScripts = await LocalStorageWrapper.get('userScripts', {});
         const storedEditingStatus = await LocalStorageWrapper.get(
-            'editing',
+            'isModalOpen',
             false
         );
         setScripts(storedScripts);
@@ -60,14 +59,14 @@ const App = () => {
     const openModal = async (name?: string) => {
         const message: PopupMessage = {
             source: 'Popup',
-            signal: PopupSignal.LaunchSession,
+            signal: 'LAUNCH_SESSION',
             scriptName: name,
         };
-        LocalStorageWrapper.set('editing', true);
+        LocalStorageWrapper.set('isModalOpen', true);
         setIsEditing('OPEN_MODAL');
         chrome.runtime.sendMessage(message, (response: ResponseMessage) => {
             if (!response.success) {
-                LocalStorageWrapper.set('editing', false);
+                LocalStorageWrapper.set('isModalOpen', false);
                 setIsEditing('NO_MODAL');
                 setErrorMessage(response.message);
             }
@@ -77,13 +76,13 @@ const App = () => {
     const closeModal = async () => {
         const message: PopupMessage = {
             source: 'Popup',
-            signal: PopupSignal.CleanSession,
+            signal: 'CLEAN_SESSION',
         };
-        LocalStorageWrapper.set('editing', false);
+        LocalStorageWrapper.set('isModalOpen', false);
         setIsEditing('NO_MODAL');
         chrome.runtime.sendMessage(message, (response: ResponseMessage) => {
             if (!response.success) {
-                LocalStorageWrapper.set('editing', true);
+                LocalStorageWrapper.set('isModalOpen', true);
                 setIsEditing('OPEN_MODAL');
                 setErrorMessage(response.message);
             }
