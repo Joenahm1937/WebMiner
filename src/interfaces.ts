@@ -141,4 +141,5 @@ export interface ILog extends SerializableObject {
     methodName: string;
     severity: Severity;
     message: string;
+    [key: string]: any;
 }

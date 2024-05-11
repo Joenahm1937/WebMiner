@@ -9,21 +9,50 @@
     position: fixed;
     top: 10%;
     left: 50%;
+    transform: translateX(-50%);
     z-index: 1000;
     background-color: #fafafa;
     border: 1px solid black;
     color: black;
     width: 400px;
+    max-height: 500px;
+    overflow-y: auto;
     border-radius: 10px;
     animation: fadeInSlideDown 0.5s ease-in-out;
     opacity: 1;
     transition: opacity 0.5s ease-out;
+    box-shadow: 0 0 0 10px #fafafa;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc #fafafa;
+}
+
+#web-miner-modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+#web-miner-modal::-webkit-scrollbar-track {
+    background: #fafafa;
+    border-radius: 10px; /* Match the border radius of the modal */
+}
+
+#web-miner-modal::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
 }
 
 #web-miner-modal button {
+    border-radius: 12px;
+    border: 1px solid transparent;
+    padding: 8px 12px;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
     color: black;
-    font-size: 16px;
-    padding: 5px 10px;
+    cursor: pointer;
+    transition: border-color 0.25s;
+}
+#web-miner-modal button:hover {
+    border-color: #646cff;
 }
 
 #web-miner-modal input {

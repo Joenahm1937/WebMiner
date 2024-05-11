@@ -1,19 +1,27 @@
 import { createCSSSelector, getElementIdentifiers } from './utils';
 import { useScriptContext } from '../ScriptContext';
-import { HIGHLIGHT_STYLE } from '../constants';
-import { isModalElement, updateElementOutline } from '../utils';
+import { isModalElement, updateElementStyles } from '../utils';
 import SelectorTable from './SelectorTable';
 import { useCallback, useEffect, useState } from 'react';
 import { ElementIdentifier } from '../interfaces';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSyncAlt, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+    faSyncAlt,
+    faCheckCircle,
+    faLeftLong,
+} from '@fortawesome/free-solid-svg-icons';
 import './ElementSelector.css';
+import { DOMSearcher } from '../DomSearcher';
 
 const ElementPicker = () => {
     const { updateStepElement, elementPickingStep, setElementPickingStep } =
         useScriptContext();
 
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isPicking, setIsPicking] = useState(false);
+    const [isTesting, setIsTesting] = useState(false);
+    const [testMatches, setTestMatches] = useState<HTMLElement[]>([]);
     const [highlightedElement, setHighlightedElement] = useState<
         ElementIdentifier | undefined
     >();
@@ -22,17 +30,21 @@ const ElementPicker = () => {
 
     const selector = createCSSSelector(selectedIdentifiers);
 
+    const goBack = () => {
+        setElementPickingStep(undefined);
+    };
+
     const handleMouseOver = useCallback((event: Event) => {
         const element = event.target as HTMLElement;
         if (isModalElement(element)) return;
-        updateElementOutline(element, HIGHLIGHT_STYLE);
+        updateElementStyles(element, true);
         setHighlightedElement(getElementIdentifiers(element));
     }, []);
 
     const handleMouseOut = useCallback((event: Event) => {
         const element = event.target as HTMLElement;
         if (isModalElement(element)) return;
-        updateElementOutline(element, '');
+        updateElementStyles(element, false);
     }, []);
 
     const disableClicks = useCallback((event: Event) => {
@@ -79,6 +91,50 @@ const ElementPicker = () => {
         setElementPickingStep(undefined);
     };
 
+    const startTester = async () => {
+        setIsTesting(true);
+        const elements = await DOMSearcher.getMatches(selector);
+        setTestMatches(elements);
+        if (elements.length) {
+            setSuccessMessage(`${elements.length} matches`);
+        } else {
+            setErrorMessage(`No matches`);
+        }
+        cleanMessages(2000);
+    };
+
+    const stopTester = async () => {
+        setIsTesting(false);
+        setTestMatches([]);
+    };
+
+    const cleanMessages = (delayMs: number) => {
+        setTimeout(() => setSuccessMessage(null), delayMs);
+        setTimeout(() => setErrorMessage(null), delayMs);
+    };
+
+    const copySelectorToClipboard = async () => {
+        try {
+            await navigator.clipboard.writeText(selector.selector);
+            setSuccessMessage('Copied to Clipboard');
+        } catch (error) {
+            setErrorMessage('Failed to Copy');
+        }
+        cleanMessages(2000);
+    };
+
+    useEffect(() => {
+        testMatches.forEach((element) => {
+            updateElementStyles(element, true);
+        });
+
+        return () => {
+            testMatches.forEach((element) => {
+                updateElementStyles(element, false);
+            });
+        };
+    }, [testMatches]);
+
     useEffect(() => {
         enterPickingState();
         return () => {
@@ -87,18 +143,34 @@ const ElementPicker = () => {
         };
     }, []);
 
+    const hasValidSelector = selector.selector.length;
+
     return (
         <div className="element-selector">
             <div className="overlay-controls">
-                {!isPicking && (
+                <button className="back-button web-miner-icon" onClick={goBack}>
+                    <FontAwesomeIcon icon={faLeftLong} className="fa-lg " />
+                </button>
+                {hasValidSelector ? (
+                    <button onClick={copySelectorToClipboard}>
+                        Copy Selector
+                    </button>
+                ) : null}
+                {hasValidSelector && !isTesting ? (
+                    <button onClick={startTester}>Test Selector</button>
+                ) : null}
+                {isTesting ? (
+                    <button onClick={stopTester}>Stop Testing</button>
+                ) : null}
+                {!isPicking ? (
                     <button
                         className="retry-button web-miner-icon"
                         onClick={enterPickingState}
                     >
                         <FontAwesomeIcon icon={faSyncAlt} className="fa-lg " />
                     </button>
-                )}
-                {!isPicking && selector.selector.length ? (
+                ) : null}
+                {hasValidSelector ? (
                     <button
                         className="confirm-button web-miner-icon"
                         onClick={confirmPickedElement}
@@ -109,12 +181,18 @@ const ElementPicker = () => {
                         />
                     </button>
                 ) : null}
+                {errorMessage && (
+                    <div className="error-banner">{errorMessage}</div>
+                )}
+                {successMessage && (
+                    <div className="success-banner">{successMessage}</div>
+                )}
             </div>
 
             <div className="selector-content">
                 {!isPicking && (
                     <div className="selector">
-                        {selector.selector.length
+                        {hasValidSelector
                             ? `Your Selector: ${selector.selector}`
                             : 'Please choose from the given identifiers:'}
                     </div>

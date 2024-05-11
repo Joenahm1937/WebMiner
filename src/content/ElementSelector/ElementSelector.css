@@ -6,6 +6,7 @@
     gap: 8px;
 }
 
+.element-selector .back-button,
 .element-selector .retry-button,
 .element-selector .confirm-button {
     color: #fff;
@@ -16,6 +17,7 @@
     transition: background-color 0.2s ease-in-out;
 }
 
+.element-selector .back-button:hover,
 .element-selector .retry-button:hover,
 .element-selector .confirm-button:hover {
     background-color: #2980b9;

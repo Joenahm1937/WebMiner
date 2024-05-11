@@ -10,8 +10,15 @@ export const tearDownModal = () => {
     }
 };
 
-export const updateElementOutline = (element: HTMLElement, style: string) => {
-    element.style.outline = style;
+export const updateElementStyles = (
+    element: HTMLElement,
+    addStyle: boolean
+) => {
+    if (addStyle) {
+        element.style.outline = '3px solid red';
+    } else {
+        element.style.outline = '';
+    }
 };
 
 export const isModalElement = (element: HTMLElement) => {

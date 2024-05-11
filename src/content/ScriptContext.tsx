@@ -45,7 +45,6 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
     if (initialName) window.myModalOriginalName = initialName;
     const initialSteps = initialScript?.steps;
     const [name, setName] = useState<string>(initialName || '');
-    // Placeholder Values (Loaded from Local Storage)
     const [steps, setSteps] = useState<ScriptStep[]>(initialSteps || []);
     const [elementPickingStep, setElementPickingStep] = useState<
         number | undefined
