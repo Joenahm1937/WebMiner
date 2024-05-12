@@ -118,7 +118,7 @@ export const createCSSSelector = (
     // Construct and return the selector object
     return {
         searchAPI: 'querySelector',
-        selector: selectorParts.join(' '),
+        selector: selectorParts.join(''),
     };
 };
 

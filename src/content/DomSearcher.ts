@@ -1,6 +1,6 @@
 import type { ILog, SelectorResult } from '../interfaces';
 
-const DEFAULT_FINDING_TIMEOUT = 3000;
+const SEARCH_TIMEOUT = 3000;
 
 /**
  * Provides utility functions for DOM manipulations and interactions, with built-in error handling.
@@ -18,39 +18,81 @@ export class DOMSearcherClass {
     public async getMatches(selection: SelectorResult): Promise<HTMLElement[]> {
         switch (selection.searchAPI) {
             case 'querySelector':
-                const elements = this.findAllNodesByQuerySelector(
-                    selection.selector
-                );
-                return elements;
+                return this.findNodesByQuerySelector(selection.selector);
+            case 'getElementsByText':
+                return this.findNodesByTextContent(selection.selector);
             default:
                 return [];
         }
     }
 
-    private findAllNodesByQuerySelector<T extends HTMLElement>(
+    private findNodesByQuerySelector(
         queryString: string,
-        node: Document | HTMLElement = document,
-        timeoutMs: number = DEFAULT_FINDING_TIMEOUT
-    ): Promise<T[]> {
+        node: Document | HTMLElement = document
+    ): Promise<HTMLElement[]> {
         return new Promise((resolve) => {
             const startTime = Date.now();
             const interval = setInterval(() => {
                 const elements = node.querySelectorAll(queryString);
-                if (elements.length !== 0) {
+                const htmlElements = Array.from(elements).filter(
+                    (element) => element instanceof HTMLElement
+                ) as HTMLElement[];
+                if (htmlElements.length !== 0) {
                     clearInterval(interval);
                     this.log({
-                        methodName: this.findAllNodesByQuerySelector.name,
+                        methodName: this.findNodesByQuerySelector.name,
                         severity: 'DEBUG',
                         message: `Found nodes with queryString ${queryString}`,
-                        elements,
+                        htmlElements,
                     });
-                    resolve(Array.from(elements) as T[]);
-                } else if (Date.now() - startTime > timeoutMs) {
+                    resolve(htmlElements);
+                } else if (Date.now() - startTime > SEARCH_TIMEOUT) {
                     clearInterval(interval);
                     this.log({
-                        methodName: this.findAllNodesByQuerySelector.name,
+                        methodName: this.findNodesByQuerySelector.name,
                         severity: 'WARN',
                         message: `Failed to nodes with queryString ${queryString}`,
+                    });
+                    resolve([]);
+                }
+            }, 100);
+        });
+    }
+
+    findNodesByTextContent(
+        textContent: string,
+        node: Document | HTMLElement = document,
+        preFilteredList: HTMLElement[] = []
+    ): Promise<HTMLElement[]> {
+        return new Promise((resolve) => {
+            const startTime = Date.now();
+            const interval = setInterval(() => {
+                const elements =
+                    preFilteredList.length > 0
+                        ? preFilteredList
+                        : node.getElementsByTagName('*');
+                const htmlElements = Array.from(elements).filter(
+                    (element) => element instanceof HTMLElement
+                ) as HTMLElement[];
+                const filteredElements = htmlElements.filter(
+                    (element) => element.textContent === textContent
+                );
+                if (filteredElements.length > 0) {
+                    clearInterval(interval);
+                    this.log({
+                        methodName: this.findNodesByTextContent.name,
+                        severity: 'DEBUG',
+                        message: `Found node with text ${textContent}`,
+                        filteredElements,
+                    });
+                    resolve(filteredElements);
+                    return;
+                } else if (Date.now() - startTime > SEARCH_TIMEOUT) {
+                    clearInterval(interval);
+                    this.log({
+                        methodName: this.findNodesByTextContent.name,
+                        severity: 'WARN',
+                        message: `Failed to find node with text ${textContent}`,
                     });
                     resolve([]);
                 }
