@@ -1,4 +1,4 @@
-import { createCSSSelector, getElementIdentifiers } from './utils';
+import { createDOMMetadata, getElementIdentifiers } from './utils';
 import { useScriptContext } from '../ScriptContext';
 import { isModalElement, updateElementStyles } from '../utils';
 import SelectorTable from './SelectorTable';
@@ -12,6 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import './ElementSelector.css';
 import { DOMSearcher } from '../DomSearcher';
+import ElementMetadata from './ElementMetadata';
 
 const ElementPicker = () => {
     const { updateStepElement, elementPickingStep, setElementPickingStep } =
@@ -28,7 +29,7 @@ const ElementPicker = () => {
     const [selectedIdentifiers, setSelectedIdentifiers] =
         useState<ElementIdentifier>({});
 
-    const selector = createCSSSelector(selectedIdentifiers);
+    const metadata = createDOMMetadata(selectedIdentifiers);
 
     const goBack = () => {
         setElementPickingStep(undefined);
@@ -87,13 +88,13 @@ const ElementPicker = () => {
     const confirmPickedElement = () => {
         document.removeEventListener('click', disableClicks, true);
         // Casting to Number because the only way we can see this view is if elementPickingStep is defined
-        updateStepElement(elementPickingStep as number, selector);
+        updateStepElement(elementPickingStep as number, metadata);
         setElementPickingStep(undefined);
     };
 
     const startTester = async () => {
         setIsTesting(true);
-        const elements = await DOMSearcher.getMatches(selector);
+        const elements = await DOMSearcher.getMatches(metadata);
         setTestMatches(elements);
         if (elements.length) {
             setSuccessMessage(`${elements.length} matches`);
@@ -115,7 +116,7 @@ const ElementPicker = () => {
 
     const copySelectorToClipboard = async () => {
         try {
-            await navigator.clipboard.writeText(selector.selector);
+            await navigator.clipboard.writeText(JSON.stringify(metadata));
             setSuccessMessage('Copied to Clipboard');
         } catch (error) {
             setErrorMessage('Failed to Copy');
@@ -143,7 +144,7 @@ const ElementPicker = () => {
         };
     }, []);
 
-    const hasValidSelector = selector.selector.length;
+    const hasValidSelector = metadata.selectors.length;
 
     return (
         <div className="element-selector">
@@ -192,9 +193,11 @@ const ElementPicker = () => {
             <div className="selector-content">
                 {!isPicking && (
                     <div className="selector">
-                        {hasValidSelector
-                            ? `Your Selector: ${selector.selector}`
-                            : 'Please choose from the given identifiers:'}
+                        {hasValidSelector ? (
+                            <ElementMetadata metadata={metadata} />
+                        ) : (
+                            <p>Please choose from the given identifiers:</p>
+                        )}
                     </div>
                 )}
                 {highlightedElement && (

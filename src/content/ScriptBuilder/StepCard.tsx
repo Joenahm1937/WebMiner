@@ -3,6 +3,7 @@ import { useScriptContext } from '../ScriptContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowPointer, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ScriptStep } from '../../interfaces';
+import ElementMetadata from '../ElementSelector/ElementMetadata';
 
 interface StepProps extends ScriptStep {
     stepNumber: number;
@@ -26,9 +27,9 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
         removeStep(stepNumber);
     };
 
-    const selectorText = element?.selector || 'Select Element';
     const isElementMissing = !element;
     const isCommandMissing = command === undefined;
+    const hasValidSelector = element && element.selectors.length;
 
     return (
         <div
@@ -58,7 +59,11 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
                             : 'step-selector-text'
                     }
                 >
-                    {selectorText}
+                    {hasValidSelector ? (
+                        <ElementMetadata metadata={element} />
+                    ) : (
+                        <p>Select Element</p>
+                    )}
                 </div>
                 <select
                     className="step-command-select"

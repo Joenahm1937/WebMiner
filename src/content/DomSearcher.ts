@@ -1,4 +1,4 @@
-import type { ILog, SelectorResult } from '../interfaces';
+import type { ILog, DOMMetadata } from '../interfaces';
 
 const SEARCH_TIMEOUT = 3000;
 
@@ -15,15 +15,18 @@ export class DOMSearcherClass {
         return DOMSearcherClass.instance;
     }
 
-    public async getMatches(selection: SelectorResult): Promise<HTMLElement[]> {
-        switch (selection.searchAPI) {
-            case 'querySelector':
-                return this.findNodesByQuerySelector(selection.selector);
-            case 'getElementsByText':
-                return this.findNodesByTextContent(selection.selector);
-            default:
-                return [];
-        }
+    public async getMatches(metadata: DOMMetadata): Promise<HTMLElement[]> {
+        console.log(metadata);
+        return [];
+
+        // switch (selection.searchAPI) {
+        //     case 'querySelector':
+        //         return this.findNodesByQuerySelector(selection.selector);
+        //     case 'getElementsByText':
+        //         return this.findNodesByTextContent(selection.selector);
+        //     default:
+        //         return [];
+        // }
     }
 
     private findNodesByQuerySelector(

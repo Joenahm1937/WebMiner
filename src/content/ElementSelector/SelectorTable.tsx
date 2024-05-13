@@ -9,7 +9,6 @@ import {
 
 const SPECIAL_SELECTORS = new Set<ElementIdentifierTypes>([
     'id',
-    'textContent',
     'uniqueSelector',
 ]);
 

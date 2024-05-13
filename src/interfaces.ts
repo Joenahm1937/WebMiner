@@ -109,13 +109,17 @@ export interface Settings extends SerializableObject {
     devMode: boolean;
 }
 
-export interface SelectorResult {
+export interface Selector {
     searchAPI: 'querySelector' | 'getElementById' | 'getElementsByText';
-    selector: string;
+    queryString: string;
+}
+
+export interface DOMMetadata {
+    selectors: Selector[];
 }
 
 export interface ScriptStep {
-    element?: SelectorResult;
+    element?: DOMMetadata;
     command?: string;
 }
 

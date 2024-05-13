@@ -1,7 +1,7 @@
 import { finder } from '@medv/finder';
 import { TEXT_LIMIT } from '../constants';
 import { ElementIdentifier } from '../interfaces';
-import { SelectorResult } from '../../interfaces';
+import { DOMMetadata, Selector } from '../../interfaces';
 
 export const getElementIdentifiers = (
     element: HTMLElement
@@ -47,35 +47,43 @@ export const getElementIdentifiers = (
         element.getAttribute('aria-roledescription') || undefined;
     identifier.ariaValueText =
         element.getAttribute('aria-valuetext') || undefined;
-    identifier.textContent = element.textContent?.trim()?.slice(0, 30);
+    identifier.textContent =
+        element.textContent && element.textContent?.length > 0
+            ? element.textContent?.trim()?.slice(0, 30)
+            : undefined;
     identifier.uniqueSelector = finder(element);
 
     return identifier;
 };
 
-export const createCSSSelector = (
+export const createDOMMetadata = (
     identifier: ElementIdentifier
-): SelectorResult => {
+): DOMMetadata => {
     if (identifier.id) {
         return {
-            searchAPI: 'getElementById',
-            selector: identifier.id,
+            selectors: [
+                {
+                    searchAPI: 'getElementById',
+                    queryString: identifier.id,
+                },
+            ],
         };
     }
 
     if (identifier.uniqueSelector) {
         return {
-            searchAPI: 'querySelector',
-            selector: identifier.uniqueSelector,
+            selectors: [
+                {
+                    searchAPI: 'querySelector',
+                    queryString: identifier.uniqueSelector,
+                },
+            ],
         };
     }
 
-    if (identifier.textContent) {
-        return {
-            searchAPI: 'getElementsByText',
-            selector: identifier.textContent,
-        };
-    }
+    /**
+     * Non-Unique Selectors that can be combined
+     */
 
     let selectorParts: string[] = [];
 
@@ -89,6 +97,24 @@ export const createCSSSelector = (
         selectorParts.push(`.${identifier.classNames.join('.')}`);
     }
 
+    const attributeMapping = {
+        href: identifier.href,
+        src: identifier.src,
+        role: identifier.role,
+        alt: identifier.alt, // Handle alt attribute for images
+        value: identifier.value, // Handle value attribute for input elements
+        title: identifier.title,
+        'aria-label': identifier.ariaLabel,
+        'aria-roledescription': identifier.ariaRoleDescription,
+        'aria-valuetext': identifier.ariaValueText,
+    };
+
+    for (const [attr, value] of Object.entries(attributeMapping)) {
+        if (value) {
+            selectorParts.push(`[${attr}="${value}"]`);
+        }
+    }
+
     // Handle special attributes and add general attributes
     if (identifier.attributes) {
         for (const [key, value] of Object.entries(identifier.attributes)) {
@@ -99,26 +125,23 @@ export const createCSSSelector = (
         }
     }
 
-    if (identifier.href) {
-        selectorParts.push(`[href="${identifier.href}"]`);
+    const selectors: Selector[] = [];
+
+    if (identifier.textContent) {
+        selectors.push({
+            searchAPI: 'getElementsByText',
+            queryString: identifier.textContent,
+        });
     }
 
-    if (identifier.src) {
-        selectorParts.push(`[src="${identifier.src}"]`);
+    if (selectorParts.length > 0) {
+        selectors.push({
+            searchAPI: 'querySelector',
+            queryString: selectorParts.join(''),
+        });
     }
-
-    if (identifier.ariaLabel) {
-        selectorParts.push(`[aria-label="${identifier.ariaLabel}"]`);
-    }
-
-    if (identifier.role) {
-        selectorParts.push(`[role="${identifier.role}"]`);
-    }
-
-    // Construct and return the selector object
     return {
-        searchAPI: 'querySelector',
-        selector: selectorParts.join(''),
+        selectors,
     };
 };
 

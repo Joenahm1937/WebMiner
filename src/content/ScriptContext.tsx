@@ -11,7 +11,7 @@ import {
     ResponseMessage,
     Script,
     ScriptStep,
-    SelectorResult,
+    DOMMetadata,
 } from '../interfaces';
 
 interface ScriptContextType {
@@ -20,7 +20,7 @@ interface ScriptContextType {
     steps: ScriptStep[];
     addStep: (newStep: ScriptStep) => void;
     updateStep: (index: number, newStep: ScriptStep) => void;
-    updateStepElement: (index: number, newElement: SelectorResult) => void;
+    updateStepElement: (index: number, newElement: DOMMetadata) => void;
     updateStepCommand: (index: number, newCommand: string) => void;
     removeStep: (index: number) => void;
     elementPickingStep?: number;
@@ -60,7 +60,7 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
         );
     };
 
-    const updateStepElement = (index: number, newElement: SelectorResult) => {
+    const updateStepElement = (index: number, newElement: DOMMetadata) => {
         setSteps((prevSteps) =>
             prevSteps.map((step, i) =>
                 i === index ? { ...step, element: newElement } : step
