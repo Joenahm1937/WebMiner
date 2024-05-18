@@ -5,7 +5,7 @@ declare global {
     }
 }
 
-export interface ElementIdentifier {
+export interface DOMSelectors {
     // ID: The id attribute is intended to be unique within a page and is often used to point directly to a specific element.
     id?: string;
 
@@ -43,8 +43,4 @@ export interface ElementIdentifier {
     uniqueSelector?: string;
 }
 
-export type ElementIdentifierTypes = keyof ElementIdentifier;
-export type PrimitiveIdentifierTypes = Exclude<
-    ElementIdentifierTypes,
-    'attributes' | 'classNames'
->;
+export type DOMSelector = keyof DOMSelectors;

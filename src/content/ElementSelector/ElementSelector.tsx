@@ -1,9 +1,9 @@
-import { createDOMMetadata, getElementIdentifiers } from './utils';
+import { createDOMMetadata, getElementSelectors } from './utils';
 import { useScriptContext } from '../ScriptContext';
 import { isModalElement, updateElementStyles } from '../utils';
 import SelectorTable from './SelectorTable';
 import { useCallback, useEffect, useState } from 'react';
-import { ElementIdentifier } from '../interfaces';
+import { DOMSelectors } from '../interfaces';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faSyncAlt,
@@ -24,12 +24,10 @@ const ElementPicker = () => {
     const [isTesting, setIsTesting] = useState(false);
     const [testMatches, setTestMatches] = useState<HTMLElement[]>([]);
     const [highlightedElement, setHighlightedElement] = useState<
-        ElementIdentifier | undefined
+        DOMSelectors | undefined
     >();
-    const [selectedIdentifiers, setSelectedIdentifiers] =
-        useState<ElementIdentifier>({});
-
-    const metadata = createDOMMetadata(selectedIdentifiers);
+    const [selected, setSelected] = useState<DOMSelectors>({});
+    const metadata = createDOMMetadata(selected);
 
     const goBack = () => {
         setElementPickingStep(undefined);
@@ -39,7 +37,7 @@ const ElementPicker = () => {
         const element = event.target as HTMLElement;
         if (isModalElement(element)) return;
         updateElementStyles(element, true);
-        setHighlightedElement(getElementIdentifiers(element));
+        setHighlightedElement(getElementSelectors(element));
     }, []);
 
     const handleMouseOut = useCallback((event: Event) => {
@@ -196,16 +194,16 @@ const ElementPicker = () => {
                         {hasValidSelector ? (
                             <ElementMetadata metadata={metadata} />
                         ) : (
-                            <p>Please choose from the given identifiers:</p>
+                            <p>Please choose from the given selectors:</p>
                         )}
                     </div>
                 )}
                 {highlightedElement && (
                     <SelectorTable
                         isPicking={isPicking}
-                        identifier={highlightedElement}
-                        selectedIdentifiers={selectedIdentifiers}
-                        setSelectedIdentifiers={setSelectedIdentifiers}
+                        selectors={highlightedElement}
+                        selected={selected}
+                        setSelected={setSelected}
                     />
                 )}
             </div>

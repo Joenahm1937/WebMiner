@@ -1,12 +1,10 @@
 import { finder } from '@medv/finder';
 import { TEXT_LIMIT } from '../constants';
-import { ElementIdentifier } from '../interfaces';
+import { DOMSelectors } from '../interfaces';
 import { DOMMetadata, Selector } from '../../interfaces';
 
-export const getElementIdentifiers = (
-    element: HTMLElement
-): ElementIdentifier => {
-    const identifier: ElementIdentifier = {
+export const getElementSelectors = (element: HTMLElement): DOMSelectors => {
+    const identifier: DOMSelectors = {
         tagName: element.tagName.toLowerCase(),
     };
 
@@ -56,9 +54,7 @@ export const getElementIdentifiers = (
     return identifier;
 };
 
-export const createDOMMetadata = (
-    identifier: ElementIdentifier
-): DOMMetadata => {
+export const createDOMMetadata = (identifier: DOMSelectors): DOMMetadata => {
     if (identifier.id) {
         return {
             selectors: [
