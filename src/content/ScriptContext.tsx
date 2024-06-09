@@ -8,22 +8,25 @@ import React, {
 } from 'react';
 import {
     ContentScriptMessage,
+    DOMCommand,
     ResponseMessage,
     Script,
     ScriptStep,
 } from '../interfaces';
 import { DOMSelectors } from './interfaces';
 import { createDOMMetadata } from './ElementSelector/utils';
+import { ScriptEngine } from './ScriptEngine';
 
 interface ScriptContextType {
     name: string;
     setName: Dispatch<SetStateAction<string>>;
     steps: ScriptStep[];
     addStep: (newStep: ScriptStep) => void;
+    playStep: (index: number) => Promise<void>;
     getStep: (index: number) => ScriptStep;
     updateStep: (index: number, newStep: ScriptStep) => void;
     updateStepElement: (index: number, newSelector: DOMSelectors) => void;
-    updateStepCommand: (index: number, newCommand: string) => void;
+    updateStepCommand: (index: number, newCommand: DOMCommand) => void;
     removeStep: (index: number) => void;
     elementPickingStep?: number;
     setElementPickingStep: Dispatch<SetStateAction<number | undefined>>;
@@ -56,6 +59,20 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
         setSteps((prevSteps) => [...prevSteps, newStep]);
     };
 
+    const playStep = (index: number) => {
+        // Adding false latency - Will introduce a default timeout Promise.race later on
+        // We want each step to rest for a small period for easy visualization
+
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                await ScriptEngine.executeStep(steps[index]);
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+        });
+    };
+
     const getStep = (index: number) => {
         return steps[index];
     };
@@ -80,7 +97,7 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
         );
     };
 
-    const updateStepCommand = (index: number, newCommand: string) => {
+    const updateStepCommand = (index: number, newCommand: DOMCommand) => {
         setSteps((prevSteps) =>
             prevSteps.map((step, i) =>
                 i === index ? { ...step, command: newCommand } : step
@@ -128,6 +145,7 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
         setName,
         steps,
         addStep,
+        playStep,
         getStep,
         updateStep,
         updateStepElement,

@@ -19,7 +19,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px; /* Adjust if needed */
+    margin: 8px; /* Adjust if needed */
 }
 
 /* Button styling for the pick button */

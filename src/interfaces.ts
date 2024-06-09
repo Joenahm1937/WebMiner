@@ -115,6 +115,15 @@ export interface Selector {
     queryString: string;
 }
 
+export const Commands = {
+    INPUT_TEXT: 'Input Text',
+    CLICK: 'Click',
+} as const;
+
+type CommandKeys = keyof typeof Commands;
+
+export type DOMCommand = (typeof Commands)[CommandKeys];
+
 export interface DOMMetadata {
     selectors: Selector[];
 }
@@ -122,7 +131,7 @@ export interface DOMMetadata {
 export interface ScriptStep {
     selectors?: DOMSelectors;
     element?: DOMMetadata;
-    command?: string;
+    command?: DOMCommand;
 }
 
 export interface Script {
