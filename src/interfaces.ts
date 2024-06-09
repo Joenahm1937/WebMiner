@@ -4,6 +4,7 @@ import {
     PopupSignal,
     SignalScriptSignal,
 } from './constants';
+import { DOMSelectors } from './content/interfaces';
 
 type WorkerSignals = keyof typeof WorkerSignal;
 type PopupSignals = keyof typeof PopupSignal;
@@ -119,6 +120,7 @@ export interface DOMMetadata {
 }
 
 export interface ScriptStep {
+    selectors?: DOMSelectors;
     element?: DOMMetadata;
     command?: string;
 }

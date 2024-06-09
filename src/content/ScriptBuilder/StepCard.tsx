@@ -70,11 +70,7 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
                     value={command ?? ''}
                     onChange={handleCommandChange}
                 >
-                    {isCommandMissing && (
-                        <option disabled value="">
-                            Select Command
-                        </option>
-                    )}
+                    {isCommandMissing && <option disabled value=""></option>}
                     <option value="Click">Click</option>
                     <option value="Input Text">Input Text</option>
                 </select>

@@ -15,8 +15,15 @@ import { DOMSearcher } from '../DomSearcher';
 import ElementMetadata from './ElementMetadata';
 
 const ElementPicker = () => {
-    const { updateStepElement, elementPickingStep, setElementPickingStep } =
-        useScriptContext();
+    const {
+        getStep,
+        updateStepElement,
+        elementPickingStep,
+        setElementPickingStep,
+    } = useScriptContext();
+
+    const initialStep = getStep(elementPickingStep as number);
+    const initialSelectors = initialStep.selectors;
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -26,7 +33,9 @@ const ElementPicker = () => {
     const [highlightedElement, setHighlightedElement] = useState<
         DOMSelectors | undefined
     >();
-    const [selected, setSelected] = useState<DOMSelectors>({});
+    const [selected, setSelected] = useState<DOMSelectors>(
+        initialSelectors || {}
+    );
     const metadata = createDOMMetadata(selected);
 
     const goBack = () => {
@@ -61,6 +70,7 @@ const ElementPicker = () => {
     }, []);
 
     const enterPickingState = () => {
+        setTestMatches([]);
         document.body.style.cursor = `url('http://wiki-devel.sugarlabs.org/images/e/e2/Arrow.cur'), auto`;
         /**
          * Disabling Clicks while Picking Element
@@ -72,6 +82,7 @@ const ElementPicker = () => {
         document.addEventListener('mouseout', handleMouseOut);
         // Using PointerUp event because click events do not trigger on disabled elements (e.g. disabled input)
         document.addEventListener('pointerup', handlePointerUp);
+        setSelected({});
         setIsPicking(true);
     };
 
@@ -86,7 +97,7 @@ const ElementPicker = () => {
     const confirmPickedElement = () => {
         document.removeEventListener('click', disableClicks, true);
         // Casting to Number because the only way we can see this view is if elementPickingStep is defined
-        updateStepElement(elementPickingStep as number, metadata);
+        updateStepElement(elementPickingStep as number, selected);
         setElementPickingStep(undefined);
     };
 
@@ -135,7 +146,11 @@ const ElementPicker = () => {
     }, [testMatches]);
 
     useEffect(() => {
-        enterPickingState();
+        if (initialSelectors) {
+            startTester();
+        } else {
+            enterPickingState();
+        }
         return () => {
             document.removeEventListener('click', disableClicks, true);
             exitPickingState();

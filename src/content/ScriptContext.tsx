@@ -11,16 +11,18 @@ import {
     ResponseMessage,
     Script,
     ScriptStep,
-    DOMMetadata,
 } from '../interfaces';
+import { DOMSelectors } from './interfaces';
+import { createDOMMetadata } from './ElementSelector/utils';
 
 interface ScriptContextType {
     name: string;
     setName: Dispatch<SetStateAction<string>>;
     steps: ScriptStep[];
     addStep: (newStep: ScriptStep) => void;
+    getStep: (index: number) => ScriptStep;
     updateStep: (index: number, newStep: ScriptStep) => void;
-    updateStepElement: (index: number, newElement: DOMMetadata) => void;
+    updateStepElement: (index: number, newSelector: DOMSelectors) => void;
     updateStepCommand: (index: number, newCommand: string) => void;
     removeStep: (index: number) => void;
     elementPickingStep?: number;
@@ -54,16 +56,26 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
         setSteps((prevSteps) => [...prevSteps, newStep]);
     };
 
+    const getStep = (index: number) => {
+        return steps[index];
+    };
+
     const updateStep = (index: number, newStep: ScriptStep) => {
         setSteps((prevSteps) =>
             prevSteps.map((step, i) => (i === index ? newStep : step))
         );
     };
 
-    const updateStepElement = (index: number, newElement: DOMMetadata) => {
+    const updateStepElement = (index: number, newSelector: DOMSelectors) => {
         setSteps((prevSteps) =>
             prevSteps.map((step, i) =>
-                i === index ? { ...step, element: newElement } : step
+                i === index
+                    ? {
+                          ...step,
+                          element: createDOMMetadata(newSelector),
+                          selectors: newSelector,
+                      }
+                    : step
             )
         );
     };
@@ -116,6 +128,7 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
         setName,
         steps,
         addStep,
+        getStep,
         updateStep,
         updateStepElement,
         updateStepCommand,

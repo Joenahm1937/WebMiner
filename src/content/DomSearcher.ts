@@ -16,17 +16,35 @@ export class DOMSearcherClass {
     }
 
     public async getMatches(metadata: DOMMetadata): Promise<HTMLElement[]> {
-        console.log(metadata);
-        return [];
+        const allResults = await Promise.all(
+            metadata.selectors.map((selector) => {
+                switch (selector.searchAPI) {
+                    case 'querySelector':
+                        return this.findNodesByQuerySelector(
+                            selector.queryString
+                        );
+                    case 'getElementsByText':
+                        return this.findNodesByTextContent(
+                            selector.queryString
+                        );
+                    // case 'getElementById':
+                    //     return this.findNodeById(selector.queryString);
+                    default:
+                        return Promise.resolve([]);
+                }
+            })
+        );
 
-        // switch (selection.searchAPI) {
-        //     case 'querySelector':
-        //         return this.findNodesByQuerySelector(selection.selector);
-        //     case 'getElementsByText':
-        //         return this.findNodesByTextContent(selection.selector);
-        //     default:
-        //         return [];
-        // }
+        if (allResults.length === 0) return [];
+
+        // Find common elements across all selector results
+        const commonResults = allResults.reduce((common, current) => {
+            return common.filter((commonElement) =>
+                current.includes(commonElement)
+            );
+        });
+
+        return commonResults;
     }
 
     private findNodesByQuerySelector(

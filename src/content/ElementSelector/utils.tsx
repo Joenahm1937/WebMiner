@@ -33,22 +33,13 @@ export const getElementSelectors = (element: HTMLElement): DOMSelectors => {
         delete identifier.attributes['class'];
     }
 
-    // Other identifiers (if needed)
-    identifier.href = (element as HTMLAnchorElement).href;
-    identifier.src = (element as HTMLImageElement).src;
-    identifier.value = (element as HTMLInputElement).value;
-    identifier.ariaLabel = element.getAttribute('aria-label') || undefined;
-    identifier.role = element.getAttribute('role') || undefined;
-    identifier.title = element.getAttribute('title') || undefined;
-    identifier.alt = (element as HTMLImageElement).alt;
-    identifier.ariaRoleDescription =
-        element.getAttribute('aria-roledescription') || undefined;
-    identifier.ariaValueText =
-        element.getAttribute('aria-valuetext') || undefined;
+    // Text Content
     identifier.textContent =
         element.textContent && element.textContent?.length > 0
             ? element.textContent?.trim()?.slice(0, 30)
             : undefined;
+
+    // Guaranteed Unique Selector
     identifier.uniqueSelector = finder(element);
 
     return identifier;
