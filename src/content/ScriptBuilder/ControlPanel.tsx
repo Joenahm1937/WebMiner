@@ -1,11 +1,17 @@
 import { useState } from 'react';
 import { useScriptContext } from '../ScriptContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileEdit, faSave, faCheck } from '@fortawesome/free-solid-svg-icons';
+import {
+    faFileEdit,
+    faSave,
+    faCheck,
+    faPlay,
+} from '@fortawesome/free-solid-svg-icons';
 import './ControlPanel.css';
 
 const ControlPanel: React.FC = () => {
-    const { name, setName, saveScript, canExecuteScript } = useScriptContext();
+    const { name, setName, saveScript, canExecuteScript, playAllSteps } =
+        useScriptContext();
     const [editNameMode, setEditNameMode] = useState<boolean>(!name);
     const [tempName, setTempName] = useState<string>(name || '');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -80,6 +86,12 @@ const ControlPanel: React.FC = () => {
                         <span className="script-name-display">{name}</span>
                     </div>
                     <div className="control-panel-row">
+                        <button
+                            className="step-play-button web-miner-icon"
+                            onClick={playAllSteps}
+                        >
+                            <FontAwesomeIcon icon={faPlay} className="fa-lg " />
+                        </button>
                         <button
                             onClick={handleSave}
                             className="save-icon-button web-miner-icon"

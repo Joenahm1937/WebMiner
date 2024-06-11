@@ -22,6 +22,8 @@ interface ScriptContextType {
     setName: Dispatch<SetStateAction<string>>;
     steps: ScriptStep[];
     addStep: (newStep: ScriptStep) => void;
+    stepStatuses: StepStatus[];
+    playAllSteps: () => Promise<void>;
     playStep: (index: number) => Promise<void>;
     getStep: (index: number) => ScriptStep;
     updateStep: (index: number, newStep: ScriptStep) => void;
@@ -41,6 +43,15 @@ interface ScriptProviderProps {
     children: ReactNode;
 }
 
+const STEP_STATUS = {
+    IDLE: 'idle',
+    RUNNING: 'running',
+    SUCCESS: 'success',
+    ERROR: 'error',
+} as const;
+
+type StepStatus = (typeof STEP_STATUS)[keyof typeof STEP_STATUS];
+
 // TODO: Begin Updating Local Storage with Added, Updated, and Remove Steps
 export const ScriptProvider: React.FC<ScriptProviderProps> = ({
     children,
@@ -51,26 +62,42 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
     const initialSteps = initialScript?.steps;
     const [name, setName] = useState<string>(initialName || '');
     const [steps, setSteps] = useState<ScriptStep[]>(initialSteps || []);
+    const [stepStatuses, setStepStatuses] = useState<StepStatus[]>(
+        initialSteps
+            ? new Array(initialSteps.length).fill(STEP_STATUS.IDLE)
+            : []
+    );
     const [elementPickingStep, setElementPickingStep] = useState<
         number | undefined
     >();
 
     const addStep = (newStep: ScriptStep) => {
         setSteps((prevSteps) => [...prevSteps, newStep]);
+        setStepStatuses((prevSteps) => [...prevSteps, 'idle']);
     };
 
-    const playStep = (index: number) => {
-        // Adding false latency - Will introduce a default timeout Promise.race later on
-        // We want each step to rest for a small period for easy visualization
+    const updateStepStatus = (index: number, newStatus: StepStatus) => {
+        setStepStatuses((prevStatus) =>
+            prevStatus.map((status, i) => (i === index ? newStatus : status))
+        );
+    };
 
-        return new Promise<void>(async (resolve, reject) => {
-            try {
-                await ScriptEngine.executeStep(steps[index]);
-                resolve();
-            } catch (error) {
-                reject(error);
-            }
-        });
+    const playAllSteps = async () => {
+        for (let i = 0; i < steps.length; i++) {
+            await playStep(i);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+    };
+
+    const playStep = async (index: number) => {
+        updateStepStatus(index, 'running');
+        try {
+            await ScriptEngine.executeStep(steps[index]);
+            updateStepStatus(index, 'success');
+        } catch (error) {
+            updateStepStatus(index, 'error');
+        }
+        setTimeout(() => updateStepStatus(index, 'idle'), 3000);
     };
 
     const getStep = (index: number) => {
@@ -145,6 +172,8 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
         setName,
         steps,
         addStep,
+        stepStatuses,
+        playAllSteps,
         playStep,
         getStep,
         updateStep,

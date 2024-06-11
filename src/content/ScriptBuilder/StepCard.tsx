@@ -8,35 +8,27 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Commands, DOMCommand, ScriptStep } from '../../interfaces';
 import ElementMetadata from '../ElementSelector/ElementMetadata';
-import { useState } from 'react';
 
 interface StepProps extends ScriptStep {
     stepNumber: number;
 }
 
 const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
-    const { setElementPickingStep, updateStepCommand, playStep, removeStep } =
-        useScriptContext();
+    const {
+        setElementPickingStep,
+        updateStepCommand,
+        stepStatuses,
+        playStep,
+        removeStep,
+    } = useScriptContext();
+
+    const stepStatus = stepStatuses[stepNumber];
+
     const enterPickingMode = () => {
         setElementPickingStep(stepNumber);
     };
 
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-    const handlePlayClick = async () => {
-        setIsPlaying(true);
-        try {
-            await playStep(stepNumber);
-            setSuccessMessage('Success');
-            setTimeout(() => setSuccessMessage(null), 3000);
-        } catch (error) {
-            setErrorMessage('There was an error');
-            setTimeout(() => setErrorMessage(null), 3000);
-        }
-        setIsPlaying(false);
-    };
+    const handlePlayClick = () => playStep(stepNumber);
 
     const handleCommandChange = (
         event: React.ChangeEvent<HTMLSelectElement>
@@ -66,10 +58,10 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
                 >
                     <FontAwesomeIcon icon={faArrowPointer} className="fa-lg " />
                 </button>
-                {!successMessage && !errorMessage && isPlaying && (
+                {stepStatus === 'running' && (
                     <div className="web-miner-icon">Playing...</div>
                 )}
-                {!successMessage && !errorMessage && !isPlaying && (
+                {stepStatus === 'idle' && (
                     <div>
                         <button
                             className="step-delete-button web-miner-icon"
@@ -88,11 +80,11 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
                         </button>
                     </div>
                 )}
-                {errorMessage && (
-                    <div className="error-banner">{errorMessage}</div>
+                {stepStatus === 'error' && (
+                    <div className="error-banner">There was an error</div>
                 )}
-                {successMessage && (
-                    <div className="success-banner">{successMessage}</div>
+                {stepStatus === 'success' && (
+                    <div className="success-banner">Success</div>
                 )}
             </div>
             <div className="step-details">
