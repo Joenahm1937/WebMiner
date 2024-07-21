@@ -1,0 +1,52 @@
+.supplemental-card-container {
+    margin: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: fadeInSlideDown 0.5s ease-in-out;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+}
+
+.input-text-area {
+    width: calc(100% - 40px);
+    height: 50px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    resize: none;
+    margin-right: 10px;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #007bff;
+}
+
+.icon-button:hover {
+    color: #0056b3;
+}
+
+.saved-text-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.saved-text {
+    flex-grow: 1;
+    padding-right: 10px;
+}

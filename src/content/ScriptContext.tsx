@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import {
     ContentScriptMessage,
-    DOMCommand,
+    ScriptCommand,
     ResponseMessage,
     Script,
     ScriptStep,
@@ -28,7 +28,7 @@ interface ScriptContextType {
     getStep: (index: number) => ScriptStep;
     updateStep: (index: number, newStep: ScriptStep) => void;
     updateStepElement: (index: number, newSelector: DOMSelectors) => void;
-    updateStepCommand: (index: number, newCommand: DOMCommand) => void;
+    updateStepCommand: (index: number, newCommand: ScriptCommand) => void;
     removeStep: (index: number) => void;
     elementPickingStep?: number;
     setElementPickingStep: Dispatch<SetStateAction<number | undefined>>;
@@ -124,7 +124,7 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
         );
     };
 
-    const updateStepCommand = (index: number, newCommand: DOMCommand) => {
+    const updateStepCommand = (index: number, newCommand: ScriptCommand) => {
         setSteps((prevSteps) =>
             prevSteps.map((step, i) =>
                 i === index ? { ...step, command: newCommand } : step
@@ -138,9 +138,13 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
 
     const canExecuteScript = (): boolean => {
         // Check each step for undefined element or command
-        return steps.every(
-            (step) => step.element !== undefined && step.command !== undefined
-        );
+        return steps.every((step) => {
+            if (!step.element || !step.command) return false;
+            if (step.command.commandType === 'Input Text') {
+                return step.command.text.length > 0;
+            }
+            return true;
+        });
     };
 
     const saveScript = async (): Promise<string> => {

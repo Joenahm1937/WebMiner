@@ -1,3 +1,7 @@
+/**
+ * Extension Message Signals
+ */
+
 export const WorkerSignal = {
     RefreshPopup: 'REFRESH_POPUP',
     CreateModal: 'CREATE_MODAL',
@@ -16,4 +20,14 @@ export const ContentScriptSignal = {
 
 export const SignalScriptSignal = {
     ModalStatus: 'MODAL_STATUS',
+} as const;
+
+/**
+ * Script Command Types
+ */
+
+export const Commands = {
+    INPUT_TEXT: 'Input Text',
+    CLICK: 'Click',
+    OPEN_LINK: 'Open Link',
 } as const;

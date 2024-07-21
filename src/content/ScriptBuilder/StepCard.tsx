@@ -6,8 +6,11 @@ import {
     faTrash,
     faPlay,
 } from '@fortawesome/free-solid-svg-icons';
-import { Commands, DOMCommand, ScriptStep } from '../../interfaces';
+import { CommandType, ScriptCommand, ScriptStep } from '../../interfaces';
+import { Commands } from '../../constants';
 import ElementMetadata from '../ElementSelector/ElementMetadata';
+import { InputText } from './SupplementalStepCards';
+import { ReactNode, useEffect, useState } from 'react';
 
 interface StepProps extends ScriptStep {
     stepNumber: number;
@@ -22,6 +25,18 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
         removeStep,
     } = useScriptContext();
 
+    const [supplementalCard, setSupplementalCard] = useState<ReactNode>(null);
+
+    useEffect(() => {
+        switch (command?.commandType) {
+            case 'Input Text':
+                setSupplementalCard(
+                    <InputText stepNumber={stepNumber} command={command} />
+                );
+                break;
+        }
+    }, []);
+
     const stepStatus = stepStatuses[stepNumber];
 
     const enterPickingMode = () => {
@@ -33,8 +48,28 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
     const handleCommandChange = (
         event: React.ChangeEvent<HTMLSelectElement>
     ) => {
-        const newCommand = event.target.value as DOMCommand;
-        updateStepCommand(stepNumber, newCommand);
+        const commandType = event.target.value as CommandType;
+        switch (commandType) {
+            case 'Click':
+                updateStepCommand(stepNumber, {
+                    commandType: 'Click',
+                });
+                setSupplementalCard(null);
+                break;
+            case 'Input Text':
+                const defaultCommand: ScriptCommand = {
+                    commandType: 'Input Text',
+                    text: '',
+                };
+                updateStepCommand(stepNumber, defaultCommand);
+                setSupplementalCard(
+                    <InputText
+                        stepNumber={stepNumber}
+                        command={defaultCommand}
+                    />
+                );
+                break;
+        }
     };
 
     const handleDeleteClick = () => {
@@ -103,7 +138,7 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
                 </div>
                 <select
                     className="step-command-select"
-                    value={command ?? ''}
+                    value={command?.commandType ?? ''}
                     onChange={handleCommandChange}
                 >
                     {isCommandMissing && <option disabled value=""></option>}
@@ -113,6 +148,7 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
                     </option>
                 </select>
             </div>
+            {supplementalCard}
         </div>
     );
 };

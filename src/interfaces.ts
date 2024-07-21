@@ -3,6 +3,7 @@ import {
     ContentScriptSignal,
     PopupSignal,
     SignalScriptSignal,
+    Commands,
 } from './constants';
 import { DOMSelectors } from './content/interfaces';
 
@@ -115,14 +116,23 @@ export interface Selector {
     queryString: string;
 }
 
-export const Commands = {
-    INPUT_TEXT: 'Input Text',
-    CLICK: 'Click',
-} as const;
-
 type CommandKeys = keyof typeof Commands;
 
-export type DOMCommand = (typeof Commands)[CommandKeys];
+export type CommandType = (typeof Commands)[CommandKeys];
+
+interface BaseCommand {
+    commandType: CommandType;
+}
+
+interface ClickCommand extends BaseCommand {
+    commandType: 'Click';
+}
+export interface InputTextCommand extends BaseCommand {
+    commandType: 'Input Text';
+    text: string;
+}
+
+export type ScriptCommand = ClickCommand | InputTextCommand;
 
 export interface DOMMetadata {
     selectors: Selector[];
@@ -131,7 +141,7 @@ export interface DOMMetadata {
 export interface ScriptStep {
     selectors?: DOMSelectors;
     element?: DOMMetadata;
-    command?: DOMCommand;
+    command?: ScriptCommand;
 }
 
 export interface Script {

@@ -19,9 +19,14 @@ class ScriptEngineClass {
             return;
         }
 
-        switch (this.step.command) {
+        if (!this.step.command) {
+            console.error('No command set for execution');
+            return;
+        }
+
+        switch (this.step.command.commandType) {
             case 'Input Text':
-                await this.inputText();
+                await this.inputText(this.step.command.text);
                 break;
             case 'Click':
                 await this.clickElement();
@@ -31,11 +36,11 @@ class ScriptEngineClass {
         }
     }
 
-    private async inputText() {
+    private async inputText(text: string) {
         const elements = await this.findElement();
         if (elements) {
             elements.forEach((element) => {
-                (element as HTMLInputElement).value = 'Sample Text';
+                (element as HTMLInputElement).value = text;
                 console.log(`Input Text into element: ${element}`);
             });
         } else {
