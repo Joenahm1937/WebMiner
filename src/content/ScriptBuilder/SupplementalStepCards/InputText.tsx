@@ -38,7 +38,7 @@ const InputText: React.FC<InputTextProps> = ({ stepNumber, command }) => {
                     </button>
                 </div>
             ) : (
-                <div className="saved-text-container">
+                <div className="supplemental-main-container">
                     <div className="saved-text">{text}</div>
                     <button
                         className="icon-button"

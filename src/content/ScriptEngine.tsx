@@ -31,6 +31,9 @@ class ScriptEngineClass {
             case 'Click':
                 await this.clickElement();
                 break;
+            case 'Open Link':
+                await this.openLink(this.step.command.scriptName);
+                break;
             default:
                 console.error(`Unknown command: ${this.step.command}`);
         }
@@ -55,9 +58,6 @@ class ScriptEngineClass {
         }
     }
 
-    /**
-     * If type submit or contains href, open in new tab instead so we can control using content script
-     */
     private async clickElement() {
         const elements = await this.findElement();
         if (elements) {
@@ -67,6 +67,22 @@ class ScriptEngineClass {
             });
         } else {
             console.error('Element not found for Click command');
+        }
+    }
+
+    private async openLink(scriptName?: string) {
+        const links = await this.findElement();
+        if (links) {
+            links.forEach((link) => {
+                if ('href' in link) {
+                    console.log(
+                        `Opening ${link.href} and injecting ${
+                            scriptName || 'no script name'
+                        }`
+                    );
+                }
+                // Send Message to SW to retrieve the script based off name and open in new tab
+            });
         }
     }
 

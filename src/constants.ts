@@ -16,6 +16,8 @@ export const PopupSignal = {
 
 export const ContentScriptSignal = {
     SaveScript: 'SAVE_SCRIPT',
+    GetScriptNames: 'GET_SCRIPT_NAMES',
+    OpenLinkInTab: 'OPEN_LINK_IN_TAB',
 } as const;
 
 export const SignalScriptSignal = {

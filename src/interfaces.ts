@@ -73,8 +73,19 @@ interface SaveScriptMessage extends BaseContentScriptMessage {
     script: Script;
     originalName?: string;
 }
+interface GetScriptNames extends BaseContentScriptMessage {
+    signal: 'GET_SCRIPT_NAMES';
+}
+interface OpenLinkInTab extends BaseContentScriptMessage {
+    signal: 'OPEN_LINK_IN_TAB';
+    linkUrl: string;
+    scriptName?: string;
+}
 
-export type ContentScriptMessage = SaveScriptMessage;
+export type ContentScriptMessage =
+    | SaveScriptMessage
+    | GetScriptNames
+    | OpenLinkInTab;
 
 interface BaseSignalScriptMessage {
     source: 'SignalScript';
@@ -131,8 +142,12 @@ export interface InputTextCommand extends BaseCommand {
     commandType: 'Input Text';
     text: string;
 }
+export interface OpenLinkCommand extends BaseCommand {
+    commandType: 'Open Link';
+    scriptName?: string;
+}
 
-export type ScriptCommand = ClickCommand | InputTextCommand;
+export type ScriptCommand = ClickCommand | InputTextCommand | OpenLinkCommand;
 
 export interface DOMMetadata {
     selectors: Selector[];

@@ -34,6 +34,7 @@ interface ScriptContextType {
     setElementPickingStep: Dispatch<SetStateAction<number | undefined>>;
     canExecuteScript: () => boolean;
     saveScript: () => Promise<string>;
+    getSavedScripts: () => Promise<string[]>;
 }
 
 const ScriptContext = createContext<ScriptContextType | undefined>(undefined);
@@ -171,6 +172,28 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
         );
     };
 
+    const getSavedScripts = (): Promise<string[]> => {
+        const script: Script = {
+            name,
+            steps,
+        };
+
+        const message: ContentScriptMessage = {
+            source: 'ContentScript',
+            signal: 'GET_SCRIPT_NAMES',
+        };
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage(message, (response: ResponseMessage) => {
+                if (response.success && response.message) {
+                    resolve(JSON.parse(response.message));
+                    window.myModalOriginalName = script.name;
+                } else {
+                    reject(response.message || 'Internal Error');
+                }
+            });
+        });
+    };
+
     const value = {
         name,
         setName,
@@ -188,6 +211,7 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
         setElementPickingStep,
         canExecuteScript,
         saveScript,
+        getSavedScripts,
     };
 
     return (

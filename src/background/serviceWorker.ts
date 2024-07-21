@@ -1,3 +1,4 @@
+import { LocalStorageWrapper } from '../LocalStorageWrapper';
 import {
     ContentScriptMessage,
     Message,
@@ -45,6 +46,17 @@ const handleContentScriptMessage = async (
                     message: 'Script already exists',
                 });
             }
+            break;
+        case 'GET_SCRIPT_NAMES':
+            const userScripts = await LocalStorageWrapper.get(
+                'userScripts',
+                {}
+            );
+            sendResponse({
+                success: true,
+                message: JSON.stringify(Object.keys(userScripts)),
+            });
+            break;
     }
 };
 

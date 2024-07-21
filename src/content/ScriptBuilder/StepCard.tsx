@@ -9,8 +9,13 @@ import {
 import { CommandType, ScriptCommand, ScriptStep } from '../../interfaces';
 import { Commands } from '../../constants';
 import ElementMetadata from '../ElementSelector/ElementMetadata';
-import { InputText } from './SupplementalStepCards';
+import { InputText, OpenLink } from './SupplementalStepCards';
 import { ReactNode, useEffect, useState } from 'react';
+
+/**
+ * TODO: Suggest Possible Commands based on Element Attributes
+ * e.g. Should only suggest Open Link for Links, Input Text for Value Elements, Clicks should be used sparingly on button submits
+ */
 
 interface StepProps extends ScriptStep {
     stepNumber: number;
@@ -32,6 +37,11 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
             case 'Input Text':
                 setSupplementalCard(
                     <InputText stepNumber={stepNumber} command={command} />
+                );
+                break;
+            case 'Open Link':
+                setSupplementalCard(
+                    <OpenLink stepNumber={stepNumber} command={command} />
                 );
                 break;
         }
@@ -57,18 +67,29 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
                 setSupplementalCard(null);
                 break;
             case 'Input Text':
-                const defaultCommand: ScriptCommand = {
+                const inputDefaultCommand: ScriptCommand = {
                     commandType: 'Input Text',
                     text: '',
                 };
-                updateStepCommand(stepNumber, defaultCommand);
+                updateStepCommand(stepNumber, inputDefaultCommand);
                 setSupplementalCard(
                     <InputText
                         stepNumber={stepNumber}
-                        command={defaultCommand}
+                        command={inputDefaultCommand}
                     />
                 );
                 break;
+            case 'Open Link':
+                const openLinkDefaultCommand: ScriptCommand = {
+                    commandType: 'Open Link',
+                };
+                updateStepCommand(stepNumber, openLinkDefaultCommand);
+                setSupplementalCard(
+                    <OpenLink
+                        stepNumber={stepNumber}
+                        command={openLinkDefaultCommand}
+                    />
+                );
         }
     };
 
@@ -145,6 +166,9 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
                     <option value={Commands.CLICK}>{Commands.CLICK}</option>
                     <option value={Commands.INPUT_TEXT}>
                         {Commands.INPUT_TEXT}
+                    </option>
+                    <option value={Commands.OPEN_LINK}>
+                        {Commands.OPEN_LINK}
                     </option>
                 </select>
             </div>
