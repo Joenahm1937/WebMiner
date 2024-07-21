@@ -5,16 +5,15 @@ interface ElementMetadataProps {
 }
 
 const ElementMetadata: React.FC<ElementMetadataProps> = ({ metadata }) => {
-    return metadata.selectors.map(({ searchAPI, queryString }) => (
+    return metadata.selectors.map(({ queryString }) => (
         <div
             style={{
                 whiteSpace: 'normal',
-                wordWrap: 'break-word',
                 fontSize: 'small',
                 overflow: 'hidden',
             }}
         >
-            {`${searchAPI}(${queryString})`}
+            {queryString}
         </div>
     ));
 };

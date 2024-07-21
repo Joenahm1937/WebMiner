@@ -85,20 +85,28 @@ const ControlPanel: React.FC = () => {
                         </button>
                         <span className="script-name-display">{name}</span>
                     </div>
-                    <div className="control-panel-row">
-                        <button
-                            className="step-play-button web-miner-icon"
-                            onClick={playAllSteps}
-                        >
-                            <FontAwesomeIcon icon={faPlay} className="fa-lg " />
-                        </button>
-                        <button
-                            onClick={handleSave}
-                            className="save-icon-button web-miner-icon"
-                        >
-                            <FontAwesomeIcon icon={faSave} className="fa-lg " />
-                        </button>
-                    </div>
+                    {!successMessage && !errorMessage && (
+                        <div className="control-panel-row">
+                            <button
+                                className="step-play-button web-miner-icon"
+                                onClick={playAllSteps}
+                            >
+                                <FontAwesomeIcon
+                                    icon={faPlay}
+                                    className="fa-lg "
+                                />
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                className="save-icon-button web-miner-icon"
+                            >
+                                <FontAwesomeIcon
+                                    icon={faSave}
+                                    className="fa-lg "
+                                />
+                            </button>
+                        </div>
+                    )}
                 </>
             )}
             {errorMessage && <div className="error-banner">{errorMessage}</div>}

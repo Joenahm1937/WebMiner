@@ -40,7 +40,14 @@ class ScriptEngineClass {
         const elements = await this.findElement();
         if (elements) {
             elements.forEach((element) => {
-                (element as HTMLInputElement).value = text;
+                const inputElement = element as HTMLInputElement;
+                inputElement.value = text;
+                inputElement.dispatchEvent(
+                    new Event('input', { bubbles: true })
+                );
+                inputElement.dispatchEvent(
+                    new Event('change', { bubbles: true })
+                );
                 console.log(`Input Text into element: ${element}`);
             });
         } else {
