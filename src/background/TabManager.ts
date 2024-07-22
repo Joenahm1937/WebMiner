@@ -34,7 +34,7 @@ class TabManagerClass {
 
     public closeTab = (tab: chrome.tabs.Tab) => {
         chrome.tabs.remove(tab.id as number, () => {
-            this.openTabsCount--;
+            if (this.openTabsCount > 0) this.openTabsCount--;
 
             if (
                 this.enabled &&
@@ -64,7 +64,7 @@ class TabManagerClass {
     public openLinks(script?: Script): void {
         const linksToProcess = this.dequeueAvailable();
         linksToProcess.forEach((link) => {
-            this.openTabsCount++;
+            if (this.tabContext.closeOnDone) this.openTabsCount++;
             chrome.tabs.create({ url: link, active: true }, (tab) => {
                 if (this.isValidTab(tab)) {
                     // Check every 1 second if the tab is ready

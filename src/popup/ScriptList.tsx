@@ -13,6 +13,7 @@ const ScriptList: React.FC<ScriptListProps> = ({ scripts, openModal }) => (
             <ScriptCard
                 key={script.name}
                 name={script.name}
+                url={script.url}
                 openModal={openModal}
             />
         ))}

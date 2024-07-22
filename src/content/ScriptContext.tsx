@@ -165,6 +165,7 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
 
     const saveScript = async (): Promise<string> => {
         const script: Script = {
+            url: window.location.href,
             name,
             steps,
         };
@@ -188,11 +189,6 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
     };
 
     const getSavedScripts = (): Promise<string[]> => {
-        const script: Script = {
-            name,
-            steps,
-        };
-
         const message: ContentScriptMessage = {
             source: 'ContentScript',
             signal: 'GET_SCRIPT_NAMES',
@@ -201,7 +197,6 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
             chrome.runtime.sendMessage(message, (response: ResponseMessage) => {
                 if (response.success && response.message) {
                     resolve(JSON.parse(response.message));
-                    window.myModalOriginalName = script.name;
                 } else {
                     reject(response.message || 'Internal Error');
                 }

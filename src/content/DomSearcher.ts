@@ -1,6 +1,6 @@
 import type { ILog, DOMMetadata } from '../interfaces';
 
-const SEARCH_TIMEOUT = 3000;
+const SEARCH_TIMEOUT = 5000;
 
 /**
  * Provides utility functions for DOM manipulations and interactions, with built-in error handling.

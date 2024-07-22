@@ -10,10 +10,45 @@
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
     padding: 1em;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, background-color 0.3s;
     cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .script-card:hover {
     transform: translateY(-0.5em);
+    background-color: #f0f0f0;
+    color: black;
+}
+
+.script-card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.script-hostname {
+    font-size: 12px;
+    font-style: italic;
+    margin-right: 10px;
+    color: #555;
+}
+
+.script-name {
+    flex-grow: 1;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.script-link {
+    color: #007bff;
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+.script-link:hover {
+    color: #0056b3;
 }

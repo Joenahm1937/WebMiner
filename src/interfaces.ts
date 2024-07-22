@@ -164,6 +164,7 @@ export interface ScriptStep {
 }
 
 export interface Script {
+    url: string;
     name: string;
     steps: ScriptStep[];
 }
