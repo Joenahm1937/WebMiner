@@ -12,12 +12,13 @@ export const WorkerSignal = {
 export const PopupSignal = {
     LaunchSession: 'LAUNCH_SESSION',
     CleanSession: 'CLEAN_SESSION',
+    OpenSessionInTab: 'OPEN_SESSION_IN_TAB',
 } as const;
 
 export const ContentScriptSignal = {
     SaveScript: 'SAVE_SCRIPT',
     GetScriptNames: 'GET_SCRIPT_NAMES',
-    OpenLinkInTab: 'OPEN_LINK_IN_TAB',
+    OpenLinksInTab: 'OPEN_LINKS_IN_TAB',
 } as const;
 
 export const SignalScriptSignal = {

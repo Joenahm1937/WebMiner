@@ -32,7 +32,7 @@ class ScriptEngineClass {
                 await this.clickElement();
                 break;
             case 'Open Link':
-                await this.openLink(this.step.command.scriptName);
+                await this.openLinks(this.step.command.scriptName);
                 break;
             default:
                 throw Error(`Unknown command: ${this.step.command}`);
@@ -70,7 +70,7 @@ class ScriptEngineClass {
         }
     }
 
-    private async openLink(scriptName?: string) {
+    private async openLinks(scriptName?: string) {
         const elements = await this.findElement();
         const links = elements?.filter(
             (element) => 'href' in element
@@ -79,7 +79,7 @@ class ScriptEngineClass {
             // TODO: maxTabs and closeOnDone should be chosen by the user in a settings UI (hardcoded with defaults for now)
             const message: ContentScriptMessage = {
                 source: 'ContentScript',
-                signal: 'OPEN_LINK_IN_TAB',
+                signal: 'OPEN_LINKS_IN_TAB',
                 linkUrls: links.map((link) => link.href),
                 maxTabs: 5,
                 closeOnDone: false,

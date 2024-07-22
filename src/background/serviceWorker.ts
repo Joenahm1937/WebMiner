@@ -10,7 +10,7 @@ import {
 import { ModalManager } from './ModalManager';
 import { TabManager } from './TabManager';
 
-const handlePopupMessage = (
+const handlePopupMessage = async (
     message: PopupMessage,
     sendResponse: (response: ResponseMessage) => void
 ) => {
@@ -21,6 +21,16 @@ const handlePopupMessage = (
             break;
         case 'CLEAN_SESSION':
             ModalManager.removeModal();
+            sendResponse({ success: true });
+            break;
+        case 'OPEN_SESSION_IN_TAB':
+            const scripts = await LocalStorageWrapper.get('userScripts', {});
+            TabManager.flushQueue();
+            TabManager.enqueue([message.linkUrl]);
+            TabManager.openLinks(
+                { closeOnDone: false, playOnLaunch: false },
+                scripts[message.scriptName]
+            );
             sendResponse({ success: true });
             break;
     }
@@ -58,10 +68,11 @@ const handleContentScriptMessage = async (
                 message: JSON.stringify(Object.keys(userScripts)),
             });
             break;
-        case 'OPEN_LINK_IN_TAB':
+        case 'OPEN_LINKS_IN_TAB':
             const scripts = await LocalStorageWrapper.get('userScripts', {});
             TabManager.enqueue(message.linkUrls);
             TabManager.openLinks(
+                { closeOnDone: false, playOnLaunch: false },
                 message.scriptName ? scripts[message.scriptName] : undefined
             );
             break;
@@ -83,7 +94,7 @@ const messageRouter = (
     switch (message.source) {
         case 'Popup':
             handlePopupMessage(message, sendResponse);
-            return false;
+            return true;
         case 'ContentScript':
             handleContentScriptMessage(message, sendResponse);
             // Response is sent asynchronously
@@ -92,6 +103,20 @@ const messageRouter = (
             handleSignalScriptMessage(message);
             return false;
     }
+};
+
+export const sendStatusPing = (tabId: number) => {
+    const message: WorkerMessage = {
+        source: 'Worker',
+        signal: 'CHECK_MODAL_STATUS',
+    };
+
+    chrome.tabs.sendMessage(tabId, message, () => {
+        if (chrome.runtime.lastError) {
+            // Stifle error
+            return;
+        }
+    });
 };
 
 const handleTabChange = (activeInfo: chrome.tabs.TabActiveInfo) => {
@@ -104,16 +129,7 @@ const handleTabChange = (activeInfo: chrome.tabs.TabActiveInfo) => {
         }
     });
 
-    const message: WorkerMessage = {
-        source: 'Worker',
-        signal: 'CHECK_MODAL_STATUS',
-    };
-    chrome.tabs.sendMessage(activeInfo.tabId, message, () => {
-        if (chrome.runtime.lastError) {
-            // Stifle error
-            return;
-        }
-    });
+    sendStatusPing(activeInfo.tabId);
 };
 
 chrome.runtime.onMessage.addListener(messageRouter);

@@ -56,18 +56,26 @@ const App = () => {
         setSettingsVisible((prevState) => !prevState);
     };
 
+    const setToEditingMode = (status: ModalState) => {
+        if (status === 'OPEN_MODAL') {
+            LocalStorageWrapper.set('isModalOpen', true);
+            setIsEditing('OPEN_MODAL');
+        } else {
+            LocalStorageWrapper.set('isModalOpen', false);
+            setIsEditing('NO_MODAL');
+        }
+    };
+
     const openModal = async (name?: string) => {
         const message: PopupMessage = {
             source: 'Popup',
             signal: 'LAUNCH_SESSION',
             scriptName: name,
         };
-        LocalStorageWrapper.set('isModalOpen', true);
-        setIsEditing('OPEN_MODAL');
+        setToEditingMode('OPEN_MODAL');
         chrome.runtime.sendMessage(message, (response: ResponseMessage) => {
             if (!response.success) {
-                LocalStorageWrapper.set('isModalOpen', false);
-                setIsEditing('NO_MODAL');
+                setToEditingMode('NO_MODAL');
                 setErrorMessage(response.message);
             }
         });
@@ -78,12 +86,10 @@ const App = () => {
             source: 'Popup',
             signal: 'CLEAN_SESSION',
         };
-        LocalStorageWrapper.set('isModalOpen', false);
-        setIsEditing('NO_MODAL');
+        setToEditingMode('NO_MODAL');
         chrome.runtime.sendMessage(message, (response: ResponseMessage) => {
             if (!response.success) {
-                LocalStorageWrapper.set('isModalOpen', true);
-                setIsEditing('OPEN_MODAL');
+                setToEditingMode('OPEN_MODAL');
                 setErrorMessage(response.message);
             }
         });
@@ -127,7 +133,11 @@ const App = () => {
                     <button onClick={deleteScripts}>{RESET_BUTTON_TEXT}</button>
                 ) : null}
                 {isEditing === 'NO_MODAL' && (
-                    <ScriptCardList scripts={scripts} openModal={openModal} />
+                    <ScriptCardList
+                        scripts={scripts}
+                        openModal={openModal}
+                        setToEditingMode={setToEditingMode}
+                    />
                 )}
                 {isEditing === 'OPEN_MODAL' ? (
                     <button onClick={closeModal}>CLOSE EDITOR</button>

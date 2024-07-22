@@ -1,5 +1,6 @@
 import { Script, WorkerMessage } from '../interfaces';
-import { IValidatedTab, TabContext } from './interfaces';
+import { IValidatedTab, ScriptContext, TabContext } from './interfaces';
+import { sendStatusPing } from './serviceWorker';
 
 /**
  * Manages and controls the opening and processing of tabs.
@@ -41,7 +42,7 @@ class TabManagerClass {
                 this.openTabsCount < this.tabContext.maxTabs &&
                 this.queue.length > 0
             ) {
-                this.openLinks();
+                this.openLinks({ closeOnDone: false, playOnLaunch: false });
             }
         });
     };
@@ -61,7 +62,7 @@ class TabManagerClass {
     /**
      * Processes the next URLs in the queue by opening new tabs if capacity allows.
      */
-    public openLinks(script?: Script): void {
+    public openLinks(scriptContext: ScriptContext, script?: Script): void {
         const linksToProcess = this.dequeueAvailable();
         linksToProcess.forEach((link) => {
             if (this.tabContext.closeOnDone) this.openTabsCount++;
@@ -81,7 +82,12 @@ class TabManagerClass {
                                         const message: WorkerMessage = {
                                             source: 'Worker',
                                             signal: 'CREATE_MODAL',
-                                            playOnLaunch: true,
+                                            scriptContext: {
+                                                playOnLaunch:
+                                                    scriptContext.playOnLaunch,
+                                                closeOnDone:
+                                                    scriptContext.closeOnDone,
+                                            },
                                             script,
                                             // TODO: playAllSteps in content script should send message back if playOnLaunch is true to tell SW to close Tab
                                             // and if settings is set to closeOnDone
@@ -90,6 +96,7 @@ class TabManagerClass {
                                             tab.id,
                                             message
                                         );
+                                        sendStatusPing(tab.id);
                                     }
                                 );
                             }

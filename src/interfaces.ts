@@ -1,3 +1,4 @@
+import { ScriptContext } from './background/interfaces';
 import {
     WorkerSignal,
     ContentScriptSignal,
@@ -33,8 +34,7 @@ interface RefreshPopupMessage extends BaseWorkerMessage {
 }
 interface CreateModalMessage extends BaseWorkerMessage {
     signal: 'CREATE_MODAL';
-    // should play when launched if script is injected/opened in a tab by user command
-    playOnLaunch: boolean;
+    scriptContext: ScriptContext;
     script?: Script;
 }
 interface RemoveModalMessage extends BaseWorkerMessage {
@@ -62,8 +62,16 @@ interface LaunchSessionMessage extends BasePopupMessage {
 interface CleanSessionMessage extends BasePopupMessage {
     signal: 'CLEAN_SESSION';
 }
+interface OpenSessionInTab extends BasePopupMessage {
+    signal: 'OPEN_SESSION_IN_TAB';
+    linkUrl: string;
+    scriptName: string;
+}
 
-export type PopupMessage = LaunchSessionMessage | CleanSessionMessage;
+export type PopupMessage =
+    | LaunchSessionMessage
+    | CleanSessionMessage
+    | OpenSessionInTab;
 
 // Content script-originated messages
 interface BaseContentScriptMessage {
@@ -78,8 +86,8 @@ interface SaveScriptMessage extends BaseContentScriptMessage {
 interface GetScriptNames extends BaseContentScriptMessage {
     signal: 'GET_SCRIPT_NAMES';
 }
-interface OpenLinkInTab extends BaseContentScriptMessage {
-    signal: 'OPEN_LINK_IN_TAB';
+interface OpenLinksInTab extends BaseContentScriptMessage {
+    signal: 'OPEN_LINKS_IN_TAB';
     linkUrls: string[];
     maxTabs: number;
     closeOnDone: boolean;
@@ -89,7 +97,7 @@ interface OpenLinkInTab extends BaseContentScriptMessage {
 export type ContentScriptMessage =
     | SaveScriptMessage
     | GetScriptNames
-    | OpenLinkInTab;
+    | OpenLinksInTab;
 
 interface BaseSignalScriptMessage {
     source: 'SignalScript';

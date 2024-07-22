@@ -10,6 +10,7 @@ export interface TabContext {
 }
 
 export interface ScriptContext {
-    closeOnDone: boolean;
+    playOnLaunch: boolean; // should play when launched if script is injected/opened in a tab by user command
+    closeOnDone: boolean; // should signal to SW when done executing script to close itself
     scriptName?: string;
 }
