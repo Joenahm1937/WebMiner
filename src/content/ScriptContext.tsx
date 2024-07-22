@@ -4,6 +4,7 @@ import React, {
     ReactNode,
     SetStateAction,
     useContext,
+    useEffect,
     useState,
 } from 'react';
 import {
@@ -40,6 +41,7 @@ interface ScriptContextType {
 const ScriptContext = createContext<ScriptContextType | undefined>(undefined);
 
 interface ScriptProviderProps {
+    playOnLaunch: boolean;
     initialScript?: Script;
     children: ReactNode;
 }
@@ -51,11 +53,17 @@ const STEP_STATUS = {
     ERROR: 'error',
 } as const;
 
-type StepStatus = (typeof STEP_STATUS)[keyof typeof STEP_STATUS];
+type StepStatusState = (typeof STEP_STATUS)[keyof typeof STEP_STATUS];
+
+interface StepStatus {
+    state: StepStatusState;
+    message?: string;
+}
 
 // TODO: Begin Updating Local Storage with Added, Updated, and Remove Steps
 export const ScriptProvider: React.FC<ScriptProviderProps> = ({
     children,
+    playOnLaunch,
     initialScript,
 }) => {
     const initialName = initialScript?.name;
@@ -65,16 +73,20 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
     const [steps, setSteps] = useState<ScriptStep[]>(initialSteps || []);
     const [stepStatuses, setStepStatuses] = useState<StepStatus[]>(
         initialSteps
-            ? new Array(initialSteps.length).fill(STEP_STATUS.IDLE)
+            ? Array(initialSteps.length).fill({ state: STEP_STATUS.IDLE })
             : []
     );
     const [elementPickingStep, setElementPickingStep] = useState<
         number | undefined
     >();
 
+    useEffect(() => {
+        if (playOnLaunch) playAllSteps();
+    }, []);
+
     const addStep = (newStep: ScriptStep) => {
         setSteps((prevSteps) => [...prevSteps, newStep]);
-        setStepStatuses((prevSteps) => [...prevSteps, 'idle']);
+        setStepStatuses((prevSteps) => [...prevSteps, { state: 'idle' }]);
     };
 
     const updateStepStatus = (index: number, newStatus: StepStatus) => {
@@ -91,14 +103,17 @@ export const ScriptProvider: React.FC<ScriptProviderProps> = ({
     };
 
     const playStep = async (index: number) => {
-        updateStepStatus(index, 'running');
+        updateStepStatus(index, { state: 'running' });
         try {
             await ScriptEngine.executeStep(steps[index]);
-            updateStepStatus(index, 'success');
+            updateStepStatus(index, { state: 'success' });
         } catch (error) {
-            updateStepStatus(index, 'error');
+            updateStepStatus(index, {
+                state: 'error',
+                message: (error as Error).message,
+            });
         }
-        setTimeout(() => updateStepStatus(index, 'idle'), 3000);
+        setTimeout(() => updateStepStatus(index, { state: 'idle' }), 3000);
     };
 
     const getStep = (index: number) => {

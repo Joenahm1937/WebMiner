@@ -33,6 +33,8 @@ interface RefreshPopupMessage extends BaseWorkerMessage {
 }
 interface CreateModalMessage extends BaseWorkerMessage {
     signal: 'CREATE_MODAL';
+    // should play when launched if script is injected/opened in a tab by user command
+    playOnLaunch: boolean;
     script?: Script;
 }
 interface RemoveModalMessage extends BaseWorkerMessage {
@@ -78,7 +80,9 @@ interface GetScriptNames extends BaseContentScriptMessage {
 }
 interface OpenLinkInTab extends BaseContentScriptMessage {
     signal: 'OPEN_LINK_IN_TAB';
-    linkUrl: string;
+    linkUrls: string[];
+    maxTabs: number;
+    closeOnDone: boolean;
     scriptName?: string;
 }
 

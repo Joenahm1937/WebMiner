@@ -31,6 +31,7 @@ class ModalManagerClass {
                             const message: WorkerMessage = {
                                 source: 'Worker',
                                 signal: 'CREATE_MODAL',
+                                playOnLaunch: false,
                                 script: scriptName
                                     ? scripts[scriptName]
                                     : undefined,

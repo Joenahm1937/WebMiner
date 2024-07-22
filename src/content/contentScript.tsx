@@ -12,7 +12,10 @@ const handleMessage = async (message: Message) => {
                     window.myModalElement = document.createElement('div');
                     document.body.appendChild(window.myModalElement);
                     ReactDOM.render(
-                        <ScriptProvider initialScript={message.script}>
+                        <ScriptProvider
+                            playOnLaunch={message.playOnLaunch}
+                            initialScript={message.script}
+                        >
                             <Modal />
                         </ScriptProvider>,
                         window.myModalElement

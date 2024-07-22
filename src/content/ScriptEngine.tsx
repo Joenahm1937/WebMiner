@@ -1,4 +1,4 @@
-import type { ScriptStep } from '../interfaces';
+import type { ContentScriptMessage, ScriptStep } from '../interfaces';
 import { DOMSearcher } from './DomSearcher';
 
 class ScriptEngineClass {
@@ -35,7 +35,7 @@ class ScriptEngineClass {
                 await this.openLink(this.step.command.scriptName);
                 break;
             default:
-                console.error(`Unknown command: ${this.step.command}`);
+                throw Error(`Unknown command: ${this.step.command}`);
         }
     }
 
@@ -54,7 +54,7 @@ class ScriptEngineClass {
                 console.log(`Input Text into element: ${element}`);
             });
         } else {
-            console.error('Element not found for Input Text command');
+            throw Error('Element not found for Input Text command');
         }
     }
 
@@ -66,23 +66,28 @@ class ScriptEngineClass {
                 console.log(`Clicked on element: ${element}`);
             });
         } else {
-            console.error('Element not found for Click command');
+            throw Error('Element not found for Click command');
         }
     }
 
     private async openLink(scriptName?: string) {
-        const links = await this.findElement();
-        if (links) {
-            links.forEach((link) => {
-                if ('href' in link) {
-                    console.log(
-                        `Opening ${link.href} and injecting ${
-                            scriptName || 'no script name'
-                        }`
-                    );
-                }
-                // Send Message to SW to retrieve the script based off name and open in new tab
-            });
+        const elements = await this.findElement();
+        const links = elements?.filter(
+            (element) => 'href' in element
+        ) as HTMLLinkElement[];
+        if (links && links.length > 0) {
+            // TODO: maxTabs and closeOnDone should be chosen by the user in a settings UI (hardcoded with defaults for now)
+            const message: ContentScriptMessage = {
+                source: 'ContentScript',
+                signal: 'OPEN_LINK_IN_TAB',
+                linkUrls: links.map((link) => link.href),
+                maxTabs: 5,
+                closeOnDone: false,
+                scriptName,
+            };
+            chrome.runtime.sendMessage(message);
+        } else {
+            throw Error('No Valid Links to Open');
         }
     }
 
@@ -95,13 +100,3 @@ class ScriptEngineClass {
 }
 
 export const ScriptEngine = ScriptEngineClass.getInstance();
-
-// Example usage:
-// const step1 = '{"command":"Input Text","element":{"selectors":[{"searchAPI":"querySelector","queryString":"textarea[title=\\"Search\\"]"}]},"selectors":{"tagName":"textarea","classNames":[],"attributes":{"title":"Search"}}}';
-// const step2 = '{"element":{"selectors":[{"searchAPI":"querySelector","queryString":"input[value=\\"Google Search\\"][role=\\"button\\"][type=\\"submit\\"]"}]},"command":"Click","selectors":{"tagName":"input","attributes":{"value":"Google Search","role":"button","type":"submit"}}}';
-
-// ScriptEngine.setStep(step1);
-// ScriptEngine.executeStep();
-
-// ScriptEngine.setStep(step2);
-// ScriptEngine.executeStep();

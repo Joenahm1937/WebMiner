@@ -114,10 +114,10 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
                 >
                     <FontAwesomeIcon icon={faArrowPointer} className="fa-lg " />
                 </button>
-                {stepStatus === 'running' && (
+                {stepStatus.state === 'running' && (
                     <div className="web-miner-icon">Playing...</div>
                 )}
-                {stepStatus === 'idle' && (
+                {stepStatus.state === 'idle' && (
                     <div>
                         <button
                             className="step-delete-button web-miner-icon"
@@ -136,10 +136,10 @@ const StepCard: React.FC<StepProps> = ({ stepNumber, element, command }) => {
                         </button>
                     </div>
                 )}
-                {stepStatus === 'error' && (
-                    <div className="error-banner">There was an error</div>
+                {stepStatus.state === 'error' && (
+                    <div className="error-banner">{stepStatus.message}</div>
                 )}
-                {stepStatus === 'success' && (
+                {stepStatus.state === 'success' && (
                     <div className="success-banner">Success</div>
                 )}
             </div>

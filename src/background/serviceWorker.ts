@@ -8,6 +8,7 @@ import {
     WorkerMessage,
 } from '../interfaces';
 import { ModalManager } from './ModalManager';
+import { TabManager } from './TabManager';
 
 const handlePopupMessage = (
     message: PopupMessage,
@@ -56,6 +57,13 @@ const handleContentScriptMessage = async (
                 success: true,
                 message: JSON.stringify(Object.keys(userScripts)),
             });
+            break;
+        case 'OPEN_LINK_IN_TAB':
+            const scripts = await LocalStorageWrapper.get('userScripts', {});
+            TabManager.enqueue(message.linkUrls);
+            TabManager.openLinks(
+                message.scriptName ? scripts[message.scriptName] : undefined
+            );
             break;
     }
 };
