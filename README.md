@@ -5,9 +5,10 @@
 **Web Miner** is a Chrome Extension currently under active development, designed to simplify the creation of automated web interaction scripts.
 Leveraging a library of basic commands, users can easily craft scripts for a wide range of purposes—from scraping web page data to automating repetitive tasks such as form submissions.
 Our vision extends to enabling script creation and visualization through the extension, with capabilities to save and execute scripts offline.
-Future updates aim to integrate an LLM node to assist users in script development further.
 
 ## How It Works
+
+https://www.youtube.com/watch?v=-TMjoVj6af4
 
 ## Development Setup
 
